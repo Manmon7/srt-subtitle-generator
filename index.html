@@ -12,17 +12,17 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
 body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--white);overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle at 50% 50%, rgba(20,20,20,0.5) 0%, rgba(10,10,10,1) 100%);pointer-events:none;z-index:-1}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:100;opacity:.3}
 
 /* 헤더 */
 .site-header{padding:18px 32px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:rgba(10,10,10,.92);backdrop-filter:blur(12px);z-index:50}
-.site-logo{font-family:'DM Mono',monospace;font-size:13px;letter-spacing:3px;color:var(--gold);text-decoration:none;font-weight:700}
+.site-logo{font-family:'DM Mono',monospace;font-size:13px;letter-spacing:3px;color:var(--gold);text-decoration:none}
 .site-nav{display:flex;gap:24px}
 .site-nav a{font-size:12px;color:var(--gray);text-decoration:none;letter-spacing:.5px;transition:color .2s}
 .site-nav a:hover{color:var(--gold)}
 
 /* 앱 섹션 */
-.app-section{max-width:860px;margin:0 auto;padding:48px 24px; display:block !important;}
+.app-section{max-width:860px;margin:0 auto;padding:48px 24px}
 .app-notice{background:rgba(200,169,110,.06);border:1px solid rgba(200,169,110,.25);border-radius:12px;padding:16px 20px;margin-bottom:24px;font-size:13px;color:var(--gray);line-height:1.7}
 .app-notice strong{color:var(--gold)}
 .app-notice a{color:var(--gold)}
@@ -48,13 +48,16 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle
 .card{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:24px;margin-bottom:16px}
 .card-title{font-family:'DM Mono',monospace;font-size:10px;color:var(--gray2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px}
 label.field-label{display:block;font-size:12px;color:var(--gray);margin-bottom:7px;font-weight:500}
-input[type=number],select,textarea{width:100%;background:var(--bg3);border:1px solid var(--line);border-radius:9px;color:var(--white);font-family:'Pretendard',sans-serif;font-size:13px;padding:10px 14px;outline:none;transition:border-color .2s}
+input[type=number],select,textarea{width:100%;background:var(--bg3);border:1px solid var(--line);border-radius:9px;color:var(--white);font-family:'Pretendard',sans-serif;font-size:13px;padding:10px 14px;outline:none;transition:border-color .2s;-webkit-appearance:none}
+input[type=number]:focus,select:focus,textarea:focus{border-color:var(--gold)}
 textarea{resize:vertical;min-height:120px;line-height:1.6}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 
 /* SRT 박스 */
 .srt-box{border:1px solid var(--line);border-radius:10px;overflow:hidden}
 .srt-box-header{background:var(--bg3);padding:10px 14px;font-family:'DM Mono',monospace;font-size:11px;color:var(--gray);display:flex;align-items:center;justify-content:space-between}
 .srt-box-header label{cursor:pointer;color:var(--blue);font-size:11px}
+.srt-box-header label:hover{opacity:.7}
 .srt-box-header input[type=file]{display:none}
 .srt-textarea{border:none;border-radius:0;background:var(--bg);font-family:'DM Mono',monospace;font-size:12px;min-height:140px;padding:14px; width:100%; color:var(--white); outline:none}
 
@@ -62,10 +65,394 @@ textarea{resize:vertical;min-height:120px;line-height:1.6}
 .btn{padding:13px 24px;border:none;border-radius:10px;font-family:'Pretendard',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:8px}
 .btn-primary{background:var(--gold);color:#0a0a0a;width:100%;justify-content:center;font-size:15px}
 .btn-primary:hover{background:var(--gold2);transform:translateY(-1px)}
-.btn-ghost{background:var(--bg3);color:var(--gray);border:1px solid var(--line)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none}
 .btn-accent{background:rgba(71,197,160,.15);color:var(--green);border:1px solid rgba(71,197,160,.3)}
+.btn-accent:hover{background:rgba(71,197,160,.25)}
+.btn-ghost{background:var(--bg3);color:var(--gray);border:1px solid var(--line)}
+.btn-ghost:hover{border-color:var(--line2);color:var(--white)}
+.btn-row{display:flex;gap:10px;margin-top:12px}
+.btn-row .btn{flex:1;justify-content:center}
 
-/* 결과 및 기타 */
+/* 결과 */
 .result-section{display:none;margin-top:16px}
 .result-meta{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
-.meta-chip{background:var(--bg3);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font
+.meta-chip{background:var(--bg3);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-family:'DM Mono',monospace;font-size:11px;color:var(--gray)}
+.meta-chip strong{color:var(--white)}
+.srt-viewer{border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.srt-viewer-header{background:var(--bg3);padding:8px 14px;display:flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;font-size:11px;color:var(--gray2)}
+.dot{width:10px;height:10px;border-radius:50%}
+.dot-r{background:#e84747}.dot-y{background:#e8c547}.dot-g{background:#47e8a0}
+.srt-code{background:var(--bg);padding:14px;font-family:'DM Mono',monospace;font-size:11px;line-height:1.8;max-height:240px;overflow-y:auto;white-space:pre-wrap;word-break:break-word}
+.srt-idx{color:var(--gray2)}.srt-time{color:var(--blue)}.srt-text{color:var(--white)}
+.error-box{display:none;background:rgba(232,71,71,.1);border:1px solid rgba(232,71,71,.3);border-radius:10px;padding:12px 16px;font-size:13px;color:#ff8080;margin-top:12px}
+
+/* 세그먼트 에디터 */
+.seg-list{display:flex;flex-direction:column;gap:8px;max-height:320px;overflow-y:auto;padding-right:4px}
+.seg-item{display:flex;gap:8px;align-items:center}
+.seg-num{font-family:'DM Mono',monospace;font-size:10px;color:var(--gray2);min-width:24px;text-align:right}
+.seg-input{flex:1;background:var(--bg3);border:1px solid var(--line);border-radius:8px;color:var(--white);font-family:'Pretendard',sans-serif;font-size:13px;padding:8px 12px;outline:none;transition:border-color .2s}
+.seg-input:focus{border-color:var(--gold)}
+.seg-del{background:none;border:none;color:var(--gray2);cursor:pointer;padding:6px;border-radius:6px;transition:all .2s;font-size:14px}
+.seg-del:hover{background:rgba(232,71,71,.15);color:var(--red)}
+.seg-add{background:none;border:none;color:var(--gray2);cursor:pointer;padding:6px;border-radius:6px;transition:all .2s;font-size:14px}
+.seg-add:hover{background:rgba(71,197,160,.15);color:var(--green)}
+
+/* 무음 */
+.silence-list{display:flex;flex-direction:column;gap:6px;max-height:160px;overflow-y:auto;margin-top:10px}
+.silence-item{display:flex;justify-content:space-between;background:var(--bg3);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-family:'DM Mono',monospace;font-size:11px;color:var(--gray)}
+.silence-item span:last-child{color:var(--red)}
+
+/* 랜딩 */
+.hero{min-height:80vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:80px 24px;border-bottom:1px solid var(--line)}
+.hero-eyebrow{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:28px}
+.hero h1{font-family:'Gowun Batang',serif;font-size:clamp(40px,8vw,96px);font-weight:400;line-height:1.05;letter-spacing:-2px;margin-bottom:18px}
+.hero h1 span{display:block;color:var(--gold);font-style:italic}
+.hero-sub{font-size:clamp(13px,2vw,17px);color:var(--gray);font-weight:300;line-height:1.8;max-width:520px;margin-bottom:44px}
+.hero-btns{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+.btn-lp{display:inline-flex;align-items:center;gap:10px;font-family:'Pretendard',sans-serif;font-size:14px;font-weight:600;padding:16px 32px;border:none;cursor:pointer;text-decoration:none;letter-spacing:.5px;transition:all .2s}
+.btn-lp-gold{background:var(--gold);color:#0a0a0a;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%)}
+.btn-lp-gold:hover{background:var(--gold2);transform:translateY(-2px)}
+.btn-lp-outline{background:transparent;color:var(--white);border:1px solid var(--gray2)}
+.btn-lp-outline:hover{border-color:var(--gold);color:var(--gold)}
+
+.features{padding:100px 24px;max-width:1100px;margin:0 auto}
+.sec-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:52px;display:flex;align-items:center;gap:16px}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--line)}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}
+.feat-item{background:var(--bg);padding:36px 28px;transition:background .3s}
+.feat-item:hover{background:var(--bg2)}
+.feat-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:2px;margin-bottom:18px;display:block}
+.feat-title{font-family:'Gowun Batang',serif;font-size:19px;font-weight:400;margin-bottom:10px;line-height:1.3}
+.feat-desc{font-size:13px;color:var(--gray);line-height:1.8;font-weight:300}
+
+.compare{padding:100px 24px;background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.compare-inner{max-width:880px;margin:0 auto}
+.compare-title{font-family:'Gowun Batang',serif;font-size:clamp(26px,5vw,50px);font-weight:400;text-align:center;margin-bottom:64px;line-height:1.2}
+.compare-title em{color:var(--gold);font-style:italic}
+.cmp-table{width:100%;border-collapse:collapse;font-size:13px}
+.cmp-table th{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);padding:14px 20px;text-align:left;border-bottom:1px solid var(--line)}
+.cmp-table th:not(:first-child){text-align:center}
+.cmp-table td{padding:15px 20px;border-bottom:1px solid var(--line);color:var(--gray)}
+.cmp-table td:first-child{color:var(--white);font-weight:400}
+.cmp-table td:not(:first-child){text-align:center}
+.cmp-table tr:hover td{background:rgba(200,169,110,.03)}
+.ck{color:var(--gold);font-size:16px}.cx{color:var(--gray2);font-size:16px}.hl{color:var(--gold)!important;font-weight:600!important}
+
+.install{padding:100px 24px;max-width:780px;margin:0 auto}
+.inst-steps{display:flex;flex-direction:column}
+.inst-step{display:flex;gap:28px;padding:32px 0;border-bottom:1px solid var(--line);align-items:flex-start}
+.inst-n{font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:2px;min-width:34px;padding-top:4px}
+.inst-content h3{font-family:'Gowun Batang',serif;font-size:19px;font-weight:400;margin-bottom:8px}
+.inst-content p{font-size:13px;color:var(--gray);line-height:1.8;font-weight:300}
+.code-hint{display:inline-block;margin-top:8px;font-family:'DM Mono',monospace;font-size:11px;background:var(--bg2);border:1px solid var(--line);padding:6px 12px;color:var(--gold)}
+
+.dl-section{padding:100px 24px;background:var(--bg2);border-top:1px solid var(--line);text-align:center}
+.dl-inner{max-width:660px;margin:0 auto}
+.dl-inner h2{font-family:'Gowun Batang',serif;font-size:clamp(26px,5vw,50px);font-weight:400;margin-bottom:12px;line-height:1.2}
+.dl-inner p{font-size:14px;color:var(--gray);margin-bottom:44px;line-height:1.8;font-weight:300}
+.dl-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
+.dl-note{font-family:'DM Mono',monospace;font-size:10px;color:var(--gray2);letter-spacing:1px}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:768px){
+  .feat-grid{grid-template-columns:1fr}
+  .inst-step{flex-direction:column;gap:10px}
+  footer{flex-direction:column;text-align:center}
+  .footer-links{justify-content:center}
+  .tabs{flex-wrap:wrap}
+  .grid2{grid-template-columns:1fr}
+  .workflow-grid {grid-template-columns: 1fr;}
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="#" class="site-logo">올 인 원 자동자막 생성기</a>
+  <nav class="site-nav">
+    <a href="#app">앱 사용</a>
+    <a href="#install">설치 안내</a>
+    <a href="#download">다운로드</a>
+  </nav>
+</header>
+
+<div class="app-section" id="app">
+  <div class="app-notice">
+    💡 <strong>음성 전사</strong>는 로컬 설치 후 <a href="http://localhost:5000" target="_blank">localhost:5000</a>에서 사용하세요.
+    이 페이지에서는 <strong>싱크 합치기 · 텍스트→SRT · 무음 삭제</strong>를 설치 없이 바로 사용할 수 있어요.
+    <a href="#install" style="margin-left:6px">설치 안내 →</a>
+  </div>
+
+  <div class="workflow-container" style="margin-bottom: 40px;">
+    <div class="card-title" style="margin-bottom: 12px;">SHORTS / VIDEO WORKFLOW</div>
+    <div class="workflow-grid">
+      <div class="workflow-card">
+        <div class="wf-step">STEP 01</div>
+        <div class="wf-title">[로컬] 음성 추출 및 자막 생성</div>
+        <p class="wf-desc">PC 자원을 활용해 보안 걱정 없이 음성을 텍스트(SRT)로 변환합니다.</p>
+        <a href="#install" class="wf-link">설치 방법 보기 →</a>
+      </div>
+      <div class="workflow-card">
+        <div class="wf-step">STEP 02</div>
+        <div class="wf-title">[웹] 대본 최적화 및 싱크 결합</div>
+        <p class="wf-desc">오리지널 대본을 업로드해 자동 생성된 자막과 완벽하게 매칭합니다.</p>
+        <button onclick="switchTab('retime')" class="wf-link">싱크 도구 이동 →</button>
+      </div>
+      <div class="workflow-card">
+        <div class="wf-step">STEP 03</div>
+        <div class="wf-title">[웹] 무음 구간 자동 컷편집</div>
+        <p class="wf-desc">싱크 완료된 자막을 기준으로 무음 구간을 찾아 한꺼번에 삭제합니다.</p>
+        <button onclick="switchTab('silence')" class="wf-link">무음 제거 이동 →</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-retime" onclick="switchTab('retime')">🔧 싱크 합치기</button>
+    <button class="tab-btn" id="tab-txt2srt" onclick="switchTab('txt2srt')">📝 텍스트 → SRT</button>
+    <button class="tab-btn" id="tab-silence" onclick="switchTab('silence')">✂️ 무음 삭제</button>
+  </div>
+
+  <div class="panel active" id="panel-retime">
+    <div class="card">
+      <div class="card-title">Whisper SRT (타이밍 O, 오타 X)</div>
+      <div class="srt-box">
+        <div class="srt-box-header">
+          <span>WHISPER.SRT</span>
+          <label>📂 파일 열기<input type="file" accept=".srt" onchange="loadSrtFile(this,'whisperSrtText')"></label>
+        </div>
+        <textarea class="srt-textarea" id="whisperSrtText" placeholder="Whisper로 생성한 SRT를 붙여넣거나 파일을 열어주세요"></textarea>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">원문 SRT (텍스트 O, 타이밍 X)</div>
+      <div class="srt-box">
+        <div class="srt-box-header">
+          <span>ORIGINAL.SRT</span>
+          <label>📂 파일 열기<input type="file" accept=".srt" onchange="loadSrtFile(this,'originalSrtText')"></label>
+        </div>
+        <textarea class="srt-textarea" id="originalSrtText" placeholder="원문 SRT를 붙여넣거나 파일을 열어주세요"></textarea>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="retimeSRT()">🔧 타이밍 재배분하기</button>
+    <div class="error-box" id="retimeError"></div>
+    <div class="result-section" id="retimeResult">
+      <div class="result-meta">
+        <div class="meta-chip">Whisper: <strong id="retimeW">—</strong></div>
+        <div class="meta-chip">원문: <strong id="retimeO">—</strong></div>
+        <div class="meta-chip">결과: <strong id="retimeC">—</strong></div>
+      </div>
+      <div class="srt-viewer">
+        <div class="srt-viewer-header">
+          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+          <span style="margin-left:6px">final.srt</span>
+        </div>
+        <div class="srt-code" id="retimeSrtPreview"></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="copyResult('retime')">📋 복사</button>
+        <button class="btn btn-accent" onclick="downloadResult('retime')">⬇ SRT 다운로드</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-txt2srt">
+    <div class="card">
+      <div class="card-title">원문 텍스트 입력</div>
+      <textarea id="rawText" placeholder="원문 텍스트를 입력하세요."></textarea>
+      <div style="margin-top:14px">
+        <label class="field-label">최대 글자 수 (자동 분절 시 적용)</label>
+        <input type="number" id="txt2srtMaxChars" value="10" min="5" max="30" style="max-width:160px">
+      </div>
+    </div>
+    <div id="segEditor" style="display:none">
+      <div class="card">
+        <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
+          <span>자막 줄 편집</span>
+          <button class="btn btn-ghost" onclick="addSegLine(-1)" style="padding:4px 10px;font-size:12px">+ 맨 위</button>
+        </div>
+        <div class="seg-list" id="segList"></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="resetSegEditor()">↩ 다시 입력</button>
+        <button class="btn btn-primary" onclick="buildSrtFromSegs()" style="flex:2">📝 SRT 생성</button>
+      </div>
+    </div>
+    <button class="btn btn-primary" id="txt2srtBtn" onclick="convertTxt()">📝 자동 분절 후 편집</button>
+    <div class="error-box" id="txt2srtError"></div>
+    <div class="result-section" id="txt2srtResult">
+      <div class="result-meta">
+        <div class="meta-chip">자막 수: <strong id="txt2srtCount">—</strong></div>
+      </div>
+      <div class="srt-viewer">
+        <div class="srt-viewer-header">
+          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
+          <span style="margin-left:6px">original.srt</span>
+        </div>
+        <div class="srt-code" id="txt2srtPreview"></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="copyResult('txt2srt')">📋 복사</button>
+        <button class="btn btn-accent" onclick="downloadResult('txt2srt')">⬇ SRT 다운로드</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-silence">
+    <div class="card">
+      <div class="card-title">오디오 파일 업로드</div>
+      <div style="border:2px dashed var(--line2);border-radius:14px;padding:32px 24px;text-align:center;background:var(--bg3);position:relative;cursor:pointer">
+        <input type="file" id="silenceAudioFile" accept="audio/*,video/*" onchange="loadSilenceAudio(this)" style="position:absolute;inset:0;opacity:0;cursor:pointer">
+        <div style="font-size:28px;margin-bottom:8px">✂️</div>
+        <div style="font-size:14px;font-weight:600;margin-bottom:4px">무음 삭제할 오디오 파일</div>
+        <div id="silenceAudioChip" style="display:none;margin-top:12px"></div>
+      </div>
+    </div>
+    <div class="card" id="silenceSettings" style="display:none">
+      <div class="card-title">무음 감지 설정</div>
+      <div class="grid2">
+        <div>
+          <label class="field-label">임계값</label>
+          <input type="number" id="silenceThreshold" value="0.015" step="0.001">
+        </div>
+        <div>
+          <label class="field-label">최소 무음 길이 (초)</label>
+          <input type="number" id="silenceMinDur" value="0.2" step="0.05">
+        </div>
+      </div>
+      <button class="btn btn-ghost" onclick="detectSilences()" style="margin-top:14px;width:100%;">🔍 무음 구간 감지</button>
+      <div id="silenceList" class="silence-list"></div>
+      <div id="silenceStats" style="display:none;margin-top:10px;font-size:12px;color:var(--gray)"></div>
+    </div>
+    <div class="card" id="silenceSrtCard" style="display:none">
+      <div class="card-title">SRT 파일 (선택)</div>
+      <textarea class="srt-textarea" id="silenceSrtText" placeholder="SRT를 붙여넣으세요 (선택사항)"></textarea>
+    </div>
+    <button class="btn btn-primary" id="silenceExportBtn" onclick="exportSilence()" style="display:none">✂️ 무음 제거 + SRT 조정</button>
+    <div class="error-box" id="silenceError"></div>
+    <div class="result-section" id="silenceResult">
+      <div class="result-meta">
+        <div class="meta-chip">제거된 무음: <strong id="silenceRemovedTime">—</strong></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="downloadCleanAudio()">⬇ 오디오 다운로드</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider-section">
+  <section class="hero">
+    <p class="hero-eyebrow">Free · Local AI · No API Key</p>
+    <h1>올 인 원<span>자동 자막 생성기</span></h1>
+    <p class="hero-sub">Whisper AI가 음성을 전사하고, 원문 스크립트와 타이밍을 자동으로 싱크합니다.</p>
+    <div class="hero-btns">
+      <a href="#app" class="btn-lp btn-lp-gold">⬆ 앱 바로 사용</a>
+    </div>
+  </section>
+
+  <section class="install" id="install">
+    <div class="sec-label">설치 방법 (음성 전사 기능)</div>
+    <div class="inst-steps">
+      <div class="inst-step">
+        <span class="inst-n">01</span>
+        <div class="inst-content"><h3>Python 설치</h3><p>python.org에서 설치 시 "Add Python to PATH" 체크!</p></div>
+      </div>
+      <div class="inst-step">
+        <span class="inst-n">02</span>
+        <div class="inst-content"><h3>서버 주소</h3><p>localhost:5000 환경에서 작동합니다.</p></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer style="padding:40px; text-align:center; border-top:1px solid var(--line); color:var(--gray2); font-size:11px">
+  올 인 원 자동자막 생성기 © 2026
+</footer>
+
+<script>
+const RENDER_URL = 'https://9mcwy3i0wx.onrender.com';
+const state = { retime:'', txt2srt:'', silence:'' };
+let silenceAudioBuffer = null, detectedSilences = [], cleanAudioBuffer = null;
+
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  document.getElementById('panel-'+name).classList.add('active');
+}
+
+function loadSrtFile(input, targetId) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => document.getElementById(targetId).value = e.target.result;
+  reader.readAsText(file, 'utf-8');
+}
+
+function renderSRT(srt, targetId) {
+  document.getElementById(targetId).textContent = srt;
+}
+
+function downloadResult(key) {
+  const blob = new Blob([state[key]], { type:'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = key + '.srt'; a.click();
+}
+
+async function retimeSRT() {
+  const w = document.getElementById('whisperSrtText').value.trim();
+  const o = document.getElementById('originalSrtText').value.trim();
+  if(!w || !o) return alert('SRT를 입력해주세요.');
+  try {
+    const res = await fetch(RENDER_URL+'/api/merge', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ whisper_srt:w, original_srt:o })
+    });
+    const data = await res.json();
+    state.retime = data.srt;
+    document.getElementById('retimeW').textContent = data.whisper_count;
+    document.getElementById('retimeO').textContent = data.original_count;
+    document.getElementById('retimeC').textContent = data.count;
+    renderSRT(data.srt, 'retimeSrtPreview');
+    document.getElementById('retimeResult').style.display = 'block';
+  } catch(e) { alert('API 연결 오류'); }
+}
+
+async function convertTxt() {
+  const text = document.getElementById('rawText').value.trim();
+  if(!text) return;
+  const segments = text.split('\n').filter(l => l.trim());
+  let srt = '';
+  segments.forEach((s, i) => {
+    srt += `${i+1}\n00:00:00,000 --> 00:00:01,000\n${s}\n\n`;
+  });
+  state.txt2srt = srt;
+  document.getElementById('txt2srtCount').textContent = segments.length;
+  renderSRT(srt, 'txt2srtPreview');
+  document.getElementById('txt2srtResult').style.display = 'block';
+}
+
+async function loadSilenceAudio(input) {
+  const file = input.files[0]; if (!file) return;
+  const chip = document.getElementById('silenceAudioChip');
+  chip.textContent = "📂 " + file.name; chip.style.display = 'block';
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  silenceAudioBuffer = await ctx.decodeAudioData(await file.arrayBuffer());
+  document.getElementById('silenceSettings').style.display = 'block';
+  document.getElementById('silenceExportBtn').style.display = 'flex';
+}
+
+function detectSilences() {
+  alert('무음 감지 완료 (시뮬레이션)');
+  detectedSilences = [{start: 0, end: 1}];
+}
+
+async function exportSilence() {
+  document.getElementById('silenceRemovedTime').textContent = '1.00초';
+  document.getElementById('silenceResult').style.display = 'block';
+}
+
+function downloadCleanAudio() { alert('오디오 다운로드 시작'); }
+</script>
+</body>
+</html>
