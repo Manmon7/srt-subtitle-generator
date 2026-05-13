@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="WaveSRT - AI 자동 자막 생성기. 싱크 합치기, 텍스트→SRT, 무음 삭제를 무료로.">
-<title>WaveSRT — AI 자동 자막 생성기</title>
+<meta name="description" content="올 인 원 자동자막 생성기 - AI 자동 자막 생성, 싱크 합치기, 무음 삭제를 무료로.">
+<title>올 인 원 자동자막 생성기 — WaveSRT</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=DM+Mono:wght@400;500&family=Pretendard:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -144,81 +144,4 @@ textarea{resize:vertical;min-height:120px;line-height:1.6}
 .install{padding:100px 24px;max-width:780px;margin:0 auto}
 .inst-steps{display:flex;flex-direction:column}
 .inst-step{display:flex;gap:28px;padding:32px 0;border-bottom:1px solid var(--line);align-items:flex-start}
-.inst-n{font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:2px;min-width:34px;padding-top:4px}
-.inst-content h3{font-family:'Gowun Batang',serif;font-size:19px;font-weight:400;margin-bottom:8px}
-.inst-content p{font-size:13px;color:var(--gray);line-height:1.8;font-weight:300}
-.code-hint{display:inline-block;margin-top:8px;font-family:'DM Mono',monospace;font-size:11px;background:var(--bg2);border:1px solid var(--line);padding:6px 12px;color:var(--gold)}
-
-.dl-section{padding:100px 24px;background:var(--bg2);border-top:1px solid var(--line);text-align:center}
-.dl-inner{max-width:660px;margin:0 auto}
-.dl-inner h2{font-family:'Gowun Batang',serif;font-size:clamp(26px,5vw,50px);font-weight:400;margin-bottom:12px;line-height:1.2}
-.dl-inner p{font-size:14px;color:var(--gray);margin-bottom:44px;line-height:1.8;font-weight:300}
-.dl-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
-.dl-note{font-family:'DM Mono',monospace;font-size:10px;color:var(--gray2);letter-spacing:1px}
-
-.bmc-wrap{text-align:center;padding:20px;border-top:1px solid var(--line)}
-.bmc-wrap a{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:var(--gray);text-decoration:none;transition:color .2s;font-family:'DM Mono',monospace;letter-spacing:1px}
-.bmc-wrap a:hover{color:var(--gold)}
-
-footer{padding:36px 24px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
-.footer-brand{font-family:'DM Mono',monospace;font-size:11px;color:var(--gray2);letter-spacing:2px}
-.footer-links{display:flex;gap:24px}
-.footer-links a{font-size:11px;color:var(--gray2);text-decoration:none;transition:color .2s}
-.footer-links a:hover{color:var(--gold)}
-
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-@media(max-width:768px){
-  .feat-grid{grid-template-columns:1fr}
-  .inst-step{flex-direction:column;gap:10px}
-  footer{flex-direction:column;text-align:center}
-  .footer-links{justify-content:center}
-  .tabs{flex-wrap:wrap}
-  .grid2{grid-template-columns:1fr}
-  .workflow-grid {grid-template-columns: 1fr;}
-}
-</style>
-</head>
-<body>
-
-<header class="site-header">
-  <a href="#" class="site-logo">WAVESRT</a>
-  <nav class="site-nav">
-    <a href="#app">앱 사용</a>
-    <a href="#install">설치 안내</a>
-    <a href="#download">다운로드</a>
-  </nav>
-</header>
-
-<div class="app-section" id="app">
-  <div class="app-notice">
-    💡 <strong>음성 전사</strong>는 로컬 설치 후 <a href="http://localhost:5000" target="_blank">localhost:5000</a>에서 사용하세요.
-    이 페이지에서는 <strong>싱크 합치기 · 텍스트→SRT · 무음 삭제</strong>를 설치 없이 바로 사용할 수 있어요.
-    <a href="#install" style="margin-left:6px">설치 안내 →</a>
-  </div>
-
-  <div class="workflow-container" style="margin-bottom: 40px;">
-    <div class="card-title" style="margin-bottom: 12px;">SHORTS / VIDEO WORKFLOW</div>
-    <div class="workflow-grid">
-      <div class="workflow-card">
-        <div class="wf-step">STEP 01</div>
-        <div class="wf-title">[로컬] 음성 추출 및 자막 생성</div>
-        <p class="wf-desc">PC 자원을 활용해 보안 걱정 없이 음성을 텍스트(SRT)로 변환합니다. 대용량 영상도 빠르게 처리 가능합니다.</p>
-        <a href="#install" class="wf-link">설치 방법 보기 →</a>
-      </div>
-      <div class="workflow-card">
-        <div class="wf-step">STEP 02</div>
-        <div class="wf-title">[웹] 대본 최적화 및 싱크 결합</div>
-        <p class="wf-desc">오리지널 대본을 업로드하여 자동 생성된 자막과 완벽하게 매칭합니다. 문장 단위로 싱크를 정교하게 맞춥니다.</p>
-        <button onclick="switchTab('retime')" class="wf-link">싱크 도구 이동 →</button>
-      </div>
-      <div class="workflow-card">
-        <div class="wf-step">STEP 03</div>
-        <div class="wf-title">[웹] 무음 구간 자동 컷편집</div>
-        <p class="wf-desc">싱크 완료된 자막을 기준으로 무음 구간을 찾아 한꺼번에 삭제합니다. 완성 후 편집기에 바로 사용하세요.</p>
-        <button onclick="switchTab('silence')" class="wf-link">무음 제거 이동 →</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="tabs">
-    <button class="tab-btn active" id="tab-
+.inst-n{font-family:'DM Mono',monospace;font-size:11px;color:var(--gold);
