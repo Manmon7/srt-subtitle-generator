@@ -27,6 +27,15 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .app-notice strong{color:var(--gold)}
 .app-notice a{color:var(--gold)}
 
+/* 워크플로우 그리드 */
+.workflow-grid {display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 40px;}
+.workflow-card {background: var(--bg2); border: 1px solid var(--line); border-radius: 12px; padding: 16px; transition: border-color 0.3s;}
+.workflow-card:hover {border-color: var(--gold2);}
+.wf-step {font-family: 'DM Mono', monospace; font-size: 11px; color: var(--gold); margin-bottom: 8px;}
+.wf-title {font-weight: 600; font-size: 14px; margin-bottom: 6px;}
+.wf-desc {font-size: 12px; color: var(--gray); line-height: 1.6;}
+.wf-link {display: inline-block; margin-top: 8px; font-size: 11px; color: var(--gold); text-decoration: none; border-bottom: 1px solid var(--gold); cursor: pointer; background: none; border-top: none; border-left: none; border-right: none; padding: 0;}
+
 /* 탭 */
 .tabs{display:flex;gap:4px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:28px}
 .tab-btn{flex:1;padding:11px 12px;border:none;border-radius:9px;background:transparent;color:var(--gray);font-family:'Pretendard',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px}
@@ -165,6 +174,7 @@ footer{padding:36px 24px;border-top:1px solid var(--line);display:flex;justify-c
   .footer-links{justify-content:center}
   .tabs{flex-wrap:wrap}
   .grid2{grid-template-columns:1fr}
+  .workflow-grid {grid-template-columns: 1fr;}
 }
 </style>
 </head>
@@ -179,7 +189,6 @@ footer{padding:36px 24px;border-top:1px solid var(--line);display:flex;justify-c
   </nav>
 </header>
 
-<!-- ══ 앱 섹션 ══ -->
 <div class="app-section" id="app">
   <div class="app-notice">
     💡 <strong>음성 전사</strong>는 로컬 설치 후 <a href="http://localhost:5000" target="_blank">localhost:5000</a>에서 사용하세요.
@@ -187,551 +196,29 @@ footer{padding:36px 24px;border-top:1px solid var(--line);display:flex;justify-c
     <a href="#install" style="margin-left:6px">설치 안내 →</a>
   </div>
 
+  <div class="workflow-container" style="margin-bottom: 40px;">
+    <div class="card-title" style="margin-bottom: 12px;">SHORTS / VIDEO WORKFLOW</div>
+    <div class="workflow-grid">
+      <div class="workflow-card">
+        <div class="wf-step">STEP 01</div>
+        <div class="wf-title">[로컬] 음성 추출 및 자막 생성</div>
+        <p class="wf-desc">PC 자원을 활용해 보안 걱정 없이 음성을 텍스트(SRT)로 변환합니다. 대용량 영상도 빠르게 처리 가능합니다.</p>
+        <a href="#install" class="wf-link">설치 방법 보기 →</a>
+      </div>
+      <div class="workflow-card">
+        <div class="wf-step">STEP 02</div>
+        <div class="wf-title">[웹] 대본 최적화 및 싱크 결합</div>
+        <p class="wf-desc">오리지널 대본을 업로드하여 자동 생성된 자막과 완벽하게 매칭합니다. 문장 단위로 싱크를 정교하게 맞춥니다.</p>
+        <button onclick="switchTab('retime')" class="wf-link">싱크 도구 이동 →</button>
+      </div>
+      <div class="workflow-card">
+        <div class="wf-step">STEP 03</div>
+        <div class="wf-title">[웹] 무음 구간 자동 컷편집</div>
+        <p class="wf-desc">싱크 완료된 자막을 기준으로 무음 구간을 찾아 한꺼번에 삭제합니다. 완성 후 편집기에 바로 사용하세요.</p>
+        <button onclick="switchTab('silence')" class="wf-link">무음 제거 이동 →</button>
+      </div>
+    </div>
+  </div>
+
   <div class="tabs">
-    <button class="tab-btn active" id="tab-retime" onclick="switchTab('retime')">🔧 싱크 합치기</button>
-    <button class="tab-btn" id="tab-txt2srt" onclick="switchTab('txt2srt')">📝 텍스트 → SRT</button>
-    <button class="tab-btn" id="tab-silence" onclick="switchTab('silence')">✂️ 무음 삭제</button>
-  </div>
-
-  <!-- 패널 1: 싱크 합치기 -->
-  <div class="panel active" id="panel-retime">
-    <div class="card">
-      <div class="card-title">Whisper SRT (타이밍 O, 오타 X)</div>
-      <div class="srt-box">
-        <div class="srt-box-header">
-          <span>WHISPER.SRT</span>
-          <label>📂 파일 열기<input type="file" accept=".srt" onchange="loadSrtFile(this,'whisperSrtText')"></label>
-        </div>
-        <textarea class="srt-textarea" id="whisperSrtText" placeholder="Whisper로 생성한 SRT를 붙여넣거나 파일을 열어주세요"></textarea>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-title">원문 SRT (텍스트 O, 타이밍 X)</div>
-      <div class="srt-box">
-        <div class="srt-box-header">
-          <span>ORIGINAL.SRT</span>
-          <label>📂 파일 열기<input type="file" accept=".srt" onchange="loadSrtFile(this,'originalSrtText')"></label>
-        </div>
-        <textarea class="srt-textarea" id="originalSrtText" placeholder="원문 SRT를 붙여넣거나 파일을 열어주세요"></textarea>
-      </div>
-    </div>
-    <button class="btn btn-primary" onclick="retimeSRT()">🔧 타이밍 재배분하기</button>
-    <div class="error-box" id="retimeError"></div>
-    <div class="result-section" id="retimeResult">
-      <div class="result-meta">
-        <div class="meta-chip">Whisper: <strong id="retimeW">—</strong></div>
-        <div class="meta-chip">원문: <strong id="retimeO">—</strong></div>
-        <div class="meta-chip">결과: <strong id="retimeC">—</strong></div>
-      </div>
-      <div class="srt-viewer">
-        <div class="srt-viewer-header">
-          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
-          <span style="margin-left:6px">final.srt</span>
-        </div>
-        <div class="srt-code" id="retimeSrtPreview"></div>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-ghost" onclick="copyResult('retime')">📋 복사</button>
-        <button class="btn btn-accent" onclick="downloadResult('retime')">⬇ SRT 다운로드</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 패널 2: 텍스트 → SRT -->
-  <div class="panel" id="panel-txt2srt">
-    <div class="card">
-      <div class="card-title">원문 텍스트 입력</div>
-      <textarea id="rawText" placeholder="원문 텍스트를 입력하세요. 엔터로 직접 줄을 나눌 수도 있어요." style="min-height:160px"></textarea>
-      <div style="margin-top:14px">
-        <label class="field-label">최대 글자 수 (한글 기준, 자동 분절 시 적용)</label>
-        <input type="number" id="txt2srtMaxChars" value="10" min="5" max="30" style="max-width:160px">
-      </div>
-    </div>
-    <div id="segEditor" style="display:none">
-      <div class="card">
-        <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
-          <span>자막 줄 편집 — 엔터로 분할 · + 추가 · × 삭제</span>
-          <button class="btn btn-ghost" onclick="addSegLine(-1)" style="padding:4px 10px;font-size:12px">+ 맨 위</button>
-        </div>
-        <div class="seg-list" id="segList"></div>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-ghost" onclick="resetSegEditor()">↩ 다시 입력</button>
-        <button class="btn btn-primary" onclick="buildSrtFromSegs()" style="flex:2">📝 SRT 생성</button>
-      </div>
-    </div>
-    <button class="btn btn-primary" id="txt2srtBtn" onclick="convertTxt()">📝 자동 분절 후 편집</button>
-    <div class="error-box" id="txt2srtError"></div>
-    <div class="result-section" id="txt2srtResult">
-      <div class="result-meta">
-        <div class="meta-chip">자막 수: <strong id="txt2srtCount">—</strong></div>
-      </div>
-      <div class="srt-viewer">
-        <div class="srt-viewer-header">
-          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
-          <span style="margin-left:6px">original.srt</span>
-        </div>
-        <div class="srt-code" id="txt2srtPreview"></div>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-ghost" onclick="copyResult('txt2srt')">📋 복사</button>
-        <button class="btn btn-accent" onclick="downloadResult('txt2srt')">⬇ SRT 다운로드</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- 패널 3: 무음 삭제 -->
-  <div class="panel" id="panel-silence">
-    <div class="card">
-      <div class="card-title">오디오 파일 업로드</div>
-      <div style="border:2px dashed var(--line2);border-radius:14px;padding:32px 24px;text-align:center;background:var(--bg3);position:relative;cursor:pointer" id="dz2">
-        <input type="file" id="silenceAudioFile" accept="audio/*,video/*" onchange="loadSilenceAudio(this)" style="position:absolute;inset:0;opacity:0;cursor:pointer">
-        <div style="font-size:28px;margin-bottom:8px">✂️</div>
-        <div style="font-size:14px;font-weight:600;margin-bottom:4px">무음 삭제할 오디오 파일</div>
-        <div style="font-size:12px;color:var(--gray)">MP3, WAV, M4A 등 지원</div>
-        <div id="silenceAudioChip" style="display:none;margin-top:12px"></div>
-      </div>
-    </div>
-    <div class="card" id="silenceSettings" style="display:none">
-      <div class="card-title">무음 감지 설정</div>
-      <div class="grid2">
-        <div>
-          <label class="field-label">감지 임계값 (낮을수록 민감)</label>
-          <input type="number" id="silenceThreshold" value="0.015" step="0.001" min="0.001" max="0.1">
-        </div>
-        <div>
-          <label class="field-label">최소 무음 길이 (초)</label>
-          <input type="number" id="silenceMinDur" value="0.2" step="0.05" min="0.05" max="2.0">
-        </div>
-      </div>
-      <button class="btn btn-ghost" onclick="detectSilences()" style="margin-top:14px;width:100%;justify-content:center">🔍 무음 구간 감지</button>
-      <div id="silenceList" class="silence-list"></div>
-      <div id="silenceStats" style="display:none;margin-top:10px;font-size:12px;color:var(--gray)"></div>
-    </div>
-    <div class="card" id="silenceSrtCard" style="display:none">
-      <div class="card-title">SRT 파일 (선택 — 타임스탬프 자동 조정)</div>
-      <div class="srt-box">
-        <div class="srt-box-header">
-          <span>INPUT.SRT</span>
-          <label>📂 파일 열기<input type="file" accept=".srt" onchange="loadSrtFile(this,'silenceSrtText')"></label>
-        </div>
-        <textarea class="srt-textarea" id="silenceSrtText" placeholder="SRT를 붙여넣거나 파일을 열어주세요 (선택)"></textarea>
-      </div>
-    </div>
-    <button class="btn btn-primary" id="silenceExportBtn" onclick="exportSilence()" style="display:none">✂️ 무음 제거 + SRT 조정</button>
-    <div class="error-box" id="silenceError"></div>
-    <div class="result-section" id="silenceResult">
-      <div class="result-meta">
-        <div class="meta-chip">제거된 무음: <strong id="silenceRemovedTime">—</strong></div>
-        <div class="meta-chip">자막 조정: <strong id="silenceAdjCount">—</strong></div>
-      </div>
-      <div class="srt-viewer" id="silenceSrtResultWrap" style="display:none">
-        <div class="srt-viewer-header">
-          <span class="dot dot-r"></span><span class="dot dot-y"></span><span class="dot dot-g"></span>
-          <span style="margin-left:6px">adjusted.srt</span>
-        </div>
-        <div class="srt-code" id="silenceSrtPreview"></div>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-ghost" onclick="downloadCleanAudio()">⬇ 오디오 다운로드</button>
-        <button class="btn btn-accent" id="silenceDlSrt" onclick="downloadResult('silence')" style="display:none">⬇ SRT 다운로드</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ 랜딩 ══ -->
-<div class="divider-section">
-
-<!-- HERO -->
-<section class="hero">
-  <p class="hero-eyebrow">Free · Local AI · No API Key</p>
-  <h1>WaveSRT<span>자동 자막 생성기</span></h1>
-  <p class="hero-sub">Whisper AI가 음성을 전사하고, 원문 스크립트와 타이밍을 자동으로 싱크합니다.</p>
-  <div class="hero-btns">
-    <a href="#app" class="btn-lp btn-lp-gold">⬆ 앱 바로 사용</a>
-    <a href="#download" class="btn-lp btn-lp-outline">⬇ 다운로드</a>
-  </div>
-</section>
-
-<!-- FEATURES -->
-<section class="features">
-  <div class="sec-label">핵심 기능</div>
-  <div class="feat-grid">
-    <div class="feat-item"><span class="feat-num">01</span><h3 class="feat-title">Whisper AI 자동 전사</h3><p class="feat-desc">로컬에서 완전 실행. API 키, 인터넷 연결 불필요.</p></div>
-    <div class="feat-item"><span class="feat-num">02</span><h3 class="feat-title">원문 스크립트 싱크</h3><p class="feat-desc">Whisper 타이밍 + 원문 텍스트 자동 매핑. 오타 없는 자막.</p></div>
-    <div class="feat-item"><span class="feat-num">03</span><h3 class="feat-title">무음 구간 제거</h3><p class="feat-desc">호흡, 무음 감지 후 제거. 오디오와 자막이 함께 조정됩니다.</p></div>
-    <div class="feat-item"><span class="feat-num">04</span><h3 class="feat-title">텍스트 → SRT</h3><p class="feat-desc">원문 텍스트를 한글 기준으로 자동 분절. 엔터로 직접 편집 가능.</p></div>
-    <div class="feat-item"><span class="feat-num">05</span><h3 class="feat-title">SRT 즉시 다운로드</h3><p class="feat-desc">Premiere Pro, CapCut, DaVinci 등 모든 편집 프로그램 호환.</p></div>
-    <div class="feat-item"><span class="feat-num">06</span><h3 class="feat-title">완전 무료 · 오프라인</h3><p class="feat-desc">구독 없음. 데이터 외부 전송 없음. 내 PC에서만 실행.</p></div>
-  </div>
-</section>
-
-<!-- COMPARE -->
-<section class="compare">
-  <div class="compare-inner">
-    <h2 class="compare-title">왜 <em>WaveSRT</em>인가요?</h2>
-    <table class="cmp-table">
-      <thead><tr><th>기능</th><th>Vrew</th><th>CapCut</th><th class="hl">WaveSRT</th></tr></thead>
-      <tbody>
-        <tr><td>자동 자막 생성</td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck hl">✓</span></td></tr>
-        <tr><td>원문 스크립트 싱크</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck hl">✓</span></td></tr>
-        <tr><td>무음 제거 + SRT 싱크</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck hl">✓</span></td></tr>
-        <tr><td>완전 무료</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck hl">✓</span></td></tr>
-        <tr><td>오프라인 실행</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck hl">✓</span></td></tr>
-      </tbody>
-    </table>
-  </div>
-</section>
-
-<!-- INSTALL -->
-<section class="install" id="install">
-  <div class="sec-label">설치 방법 (음성 전사 기능)</div>
-  <div class="inst-steps">
-    <div class="inst-step">
-      <span class="inst-n">01</span>
-      <div class="inst-content">
-        <h3>Python 설치</h3>
-        <p>python.org에서 Python을 다운로드하세요.<br>설치 시 반드시 <strong style="color:var(--gold)">"Add Python to PATH"</strong> 체크!</p>
-        <a href="https://www.python.org/downloads/" target="_blank" class="code-hint">→ python.org/downloads</a>
-      </div>
-    </div>
-    <div class="inst-step">
-      <span class="inst-n">02</span>
-      <div class="inst-content">
-        <h3>WaveSRT 다운로드</h3>
-        <p>아래 다운로드 버튼에서 운영체제에 맞는 파일을 받으세요.</p>
-        <a href="#download" class="code-hint">→ 다운로드 섹션으로 이동</a>
-      </div>
-    </div>
-    <div class="inst-step">
-      <span class="inst-n">03</span>
-      <div class="inst-content">
-        <h3>setup 파일 실행</h3>
-        <p>압축 해제 후 setup 파일을 실행하면 ffmpeg, Whisper, Flask가 자동 설치됩니다.</p>
-        <span class="code-hint">Windows: setup.bat 더블클릭</span><br>
-        <span class="code-hint" style="margin-top:6px">Mac/Linux: bash setup.sh</span>
-      </div>
-    </div>
-    <div class="inst-step">
-      <span class="inst-n">04</span>
-      <div class="inst-content">
-        <h3>localhost:5000에서 전사 사용</h3>
-        <p>setup이 실행된 상태에서 localhost:5000으로 접속하면 음성 전사 기능을 사용할 수 있어요.</p>
-        <a href="http://localhost:5000" target="_blank" class="code-hint">→ localhost:5000 열기</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- DOWNLOAD -->
-<section class="dl-section" id="download">
-  <div class="dl-inner">
-    <h2>지금 시작하세요</h2>
-    <p>완전 무료 · 데이터 외부 전송 없음 · 오프라인 작동</p>
-    <div class="dl-btns">
-      <a href="https://github.com/Manmon7/srt-subtitle-generator/releases/latest/download/Windows.zip" class="btn-lp btn-lp-gold">⬇ Windows 다운로드</a>
-      <a href="https://github.com/Manmon7/srt-subtitle-generator/releases/latest/download/Mac_linux.zip" class="btn-lp btn-lp-outline">⬇ Mac / Linux</a>
-    </div>
-    <p class="dl-note">Python 3.8 이상 필요 · Windows 10+ · macOS 11+</p>
-  </div>
-</section>
-
-<div class="bmc-wrap">
-  <a href="https://buymeacoffee.com/wavesrt" target="_blank">☕ 이 도구가 도움이 됐다면 커피 한 잔 사주세요</a>
-</div>
-
-<footer>
-  <span class="footer-brand">WAVESRT © 2025</span>
-  <div class="footer-links">
-    <a href="https://github.com/Manmon7/srt-subtitle-generator" target="_blank">GitHub</a>
-    <a href="#install">설치 가이드</a>
-    <a href="#app">앱 사용</a>
-  </div>
-</footer>
-
-</div>
-
-<script>
-const RENDER_URL = 'https://9mcwy3i0wx.onrender.com';
-const state = { retime:'', txt2srt:'', silence:'' };
-let silenceAudioBuffer = null, detectedSilences = [], cleanAudioBuffer = null;
-
-function switchTab(name) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('tab-'+name).classList.add('active');
-  document.getElementById('panel-'+name).classList.add('active');
-}
-
-function loadSrtFile(input, targetId) {
-  const file = input.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => document.getElementById(targetId).value = e.target.result;
-  reader.readAsText(file, 'utf-8');
-}
-
-function renderSRT(srt, targetId) {
-  const el = document.getElementById(targetId);
-  let html = '';
-  for (const line of srt.split('\n')) {
-    if (/^\d+$/.test(line.trim())) html += `<span class="srt-idx">${line}</span>\n`;
-    else if (line.includes(' --> ')) html += `<span class="srt-time">${line}</span>\n`;
-    else if (line.trim()) html += `<span class="srt-text">${line}</span>\n`;
-    else html += '\n';
-  }
-  el.innerHTML = html;
-}
-
-async function copyResult(key) {
-  await navigator.clipboard.writeText(state[key]);
-  const map = { retime:'retimeResult', txt2srt:'txt2srtResult', silence:'silenceResult' };
-  const btn = document.querySelector(`#${map[key]} .btn-ghost`);
-  if (btn) { btn.textContent = '✅ 복사됨!'; setTimeout(() => btn.textContent = '📋 복사', 1500); }
-}
-function downloadResult(key) {
-  const names = { retime:'final', txt2srt:'original', silence:'adjusted' };
-  const blob = new Blob([state[key]], { type:'text/plain;charset=utf-8' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob); a.download = names[key]+'.srt'; a.click();
-  URL.revokeObjectURL(a.href);
-}
-
-// ── 싱크 합치기 ──
-async function retimeSRT() {
-  const errEl = document.getElementById('retimeError');
-  const resEl = document.getElementById('retimeResult');
-  errEl.style.display = 'none'; resEl.style.display = 'none';
-  const w = document.getElementById('whisperSrtText').value.trim();
-  const o = document.getElementById('originalSrtText').value.trim();
-  if (!w) { errEl.textContent = '⚠ Whisper SRT를 입력해주세요'; errEl.style.display='block'; return; }
-  if (!o) { errEl.textContent = '⚠ 원문 SRT를 입력해주세요'; errEl.style.display='block'; return; }
-  try {
-    const res = await fetch(RENDER_URL+'/api/merge', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ whisper_srt:w, original_srt:o })
-    });
-    const data = await res.json();
-    if (data.error) throw new Error(data.error);
-    state.retime = data.srt;
-    document.getElementById('retimeW').textContent = data.whisper_count;
-    document.getElementById('retimeO').textContent = data.original_count;
-    document.getElementById('retimeC').textContent = data.count;
-    renderSRT(data.srt, 'retimeSrtPreview');
-    resEl.style.display = 'block';
-  } catch(e) { errEl.textContent = '⚠ '+e.message; errEl.style.display='block'; }
-}
-
-// ── 텍스트 → SRT ──
-let currentSegments = [];
-
-async function convertTxt() {
-  const errEl = document.getElementById('txt2srtError');
-  errEl.style.display = 'none';
-  const text = document.getElementById('rawText').value.trim();
-  if (!text) { errEl.textContent = '⚠ 텍스트를 입력해주세요'; errEl.style.display='block'; return; }
-  const lines = text.split('\n').map(l => l.trim()).filter(l => l);
-  if (lines.length > 1) {
-    currentSegments = lines; renderSegEditor(); return;
-  }
-  try {
-    const res = await fetch(RENDER_URL+'/api/txt_to_srt', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ text, max_chars: parseInt(document.getElementById('txt2srtMaxChars').value) })
-    });
-    const data = await res.json();
-    if (data.error) throw new Error(data.error);
-    currentSegments = data.segments;
-    renderSegEditor();
-  } catch(e) { errEl.textContent = '⚠ '+e.message; errEl.style.display='block'; }
-}
-
-function renderSegEditor() {
-  const list = document.getElementById('segList');
-  list.innerHTML = '';
-  currentSegments.forEach((seg, i) => {
-    const div = document.createElement('div');
-    div.className = 'seg-item';
-    div.innerHTML = `
-      <span class="seg-num">${String(i+1).padStart(2,'0')}</span>
-      <input class="seg-input" value="${seg.replace(/"/g,'&quot;').replace(/</g,'&lt;')}"
-        onchange="currentSegments[${i}]=this.value"
-        onkeydown="segKeyDown(event,${i})">
-      <button class="seg-add" onclick="addSegLine(${i})" title="아래 줄 추가">＋</button>
-      <button class="seg-del" onclick="delSegLine(${i})" title="삭제">×</button>`;
-    list.appendChild(div);
-  });
-  document.getElementById('segEditor').style.display = 'block';
-  document.getElementById('txt2srtBtn').style.display = 'none';
-  document.getElementById('txt2srtResult').style.display = 'none';
-}
-
-function resetSegEditor() {
-  document.getElementById('segEditor').style.display = 'none';
-  document.getElementById('txt2srtBtn').style.display = 'flex';
-}
-
-function segKeyDown(e, i) {
-  if (e.key !== 'Enter') return;
-  e.preventDefault();
-  const input = e.target;
-  const pos = input.selectionStart;
-  const val = input.value;
-  currentSegments[i] = val.slice(0, pos).trim();
-  currentSegments.splice(i+1, 0, val.slice(pos).trim());
-  renderSegEditor();
-  setTimeout(() => {
-    const inputs = document.querySelectorAll('.seg-input');
-    if (inputs[i+1]) { inputs[i+1].focus(); inputs[i+1].setSelectionRange(0,0); }
-  }, 0);
-}
-
-function addSegLine(i) {
-  if (i < 0) currentSegments.unshift('');
-  else currentSegments.splice(i+1, 0, '');
-  renderSegEditor();
-  setTimeout(() => {
-    const idx = i < 0 ? 0 : i+1;
-    const inputs = document.querySelectorAll('.seg-input');
-    if (inputs[idx]) inputs[idx].focus();
-  }, 0);
-}
-
-function delSegLine(i) {
-  if (currentSegments.length <= 1) return;
-  currentSegments.splice(i, 1);
-  renderSegEditor();
-}
-
-function buildSrtFromSegs() {
-  document.querySelectorAll('.seg-input').forEach((el, i) => { currentSegments[i] = el.value; });
-  const segs = currentSegments.filter(s => s.trim());
-  const lines = [];
-  segs.forEach((t, i) => { lines.push(String(i+1), '00:00:00,000 --> 00:00:00,000', t, ''); });
-  const srt = lines.join('\n');
-  state.txt2srt = srt;
-  document.getElementById('txt2srtCount').textContent = segs.length + '개';
-  renderSRT(srt, 'txt2srtPreview');
-  document.getElementById('txt2srtResult').style.display = 'block';
-}
-
-// ── 무음 삭제 ──
-async function loadSilenceAudio(input) {
-  const file = input.files[0]; if (!file) return;
-  const chip = document.getElementById('silenceAudioChip');
-  chip.innerHTML = `<div style="display:inline-flex;align-items:center;gap:8px;background:rgba(71,197,160,.1);border:1px solid rgba(71,197,160,.25);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--green)">✂️ ${file.name}</div>`;
-  chip.style.display = 'block';
-  const ctx = new (window.AudioContext || window.webkitAudioContext)();
-  silenceAudioBuffer = await ctx.decodeAudioData(await file.arrayBuffer());
-  document.getElementById('silenceSettings').style.display = 'block';
-  document.getElementById('silenceSrtCard').style.display = 'block';
-  document.getElementById('silenceExportBtn').style.display = 'flex';
-}
-
-function detectSilences() {
-  if (!silenceAudioBuffer) return;
-  const threshold = parseFloat(document.getElementById('silenceThreshold').value);
-  const minDur    = parseFloat(document.getElementById('silenceMinDur').value);
-  const data = silenceAudioBuffer.getChannelData(0);
-  const sr   = silenceAudioBuffer.sampleRate;
-  const ws   = Math.floor(sr * 0.02);
-  const sils = [];
-  let isSil = false, silStart = 0;
-  for (let i = 0; i < data.length; i += ws) {
-    let sq = 0; const end = Math.min(i+ws, data.length);
-    for (let j = i; j < end; j++) sq += data[j]*data[j];
-    const rms = Math.sqrt(sq/(end-i)), t = i/sr;
-    if (rms < threshold) { if (!isSil) { isSil=true; silStart=t; } }
-    else { if (isSil) { isSil=false; if(t-silStart>=minDur) sils.push({start:silStart,end:t}); } }
-  }
-  if (isSil) { const d=data.length/sr-silStart; if(d>=minDur) sils.push({start:silStart,end:data.length/sr}); }
-  detectedSilences = sils;
-  const list = document.getElementById('silenceList');
-  list.innerHTML = sils.length===0
-    ? '<div style="font-size:12px;color:var(--gray);padding:8px">감지된 무음 구간이 없어요</div>'
-    : sils.map((s,i)=>`<div class="silence-item"><span>${i+1}. ${s.start.toFixed(2)}s ~ ${s.end.toFixed(2)}s</span><span>${(s.end-s.start).toFixed(2)}s</span></div>`).join('');
-  const total = sils.reduce((a,s)=>a+(s.end-s.start),0);
-  const stats = document.getElementById('silenceStats');
-  stats.style.display='block';
-  stats.textContent = `감지: ${sils.length}개 / 총 ${total.toFixed(2)}초 제거 예정`;
-}
-
-async function exportSilence() {
-  const errEl = document.getElementById('silenceError');
-  const resEl = document.getElementById('silenceResult');
-  errEl.style.display='none'; resEl.style.display='none';
-  if (!silenceAudioBuffer) { errEl.textContent='⚠ 오디오 파일을 먼저 업로드해주세요'; errEl.style.display='block'; return; }
-  if (detectedSilences.length === 0) detectSilences();
-  try {
-    const totalDur = silenceAudioBuffer.duration;
-    const keepSegs = [];
-    let lastEnd = 0;
-    for (const s of detectedSilences) {
-      if (s.start > lastEnd) keepSegs.push({start:lastEnd, end:s.start});
-      lastEnd = s.end;
-    }
-    if (lastEnd < totalDur) keepSegs.push({start:lastEnd, end:totalDur});
-    const cleanDur = keepSegs.reduce((a,s)=>a+(s.end-s.start), 0);
-    const offCtx = new OfflineAudioContext(silenceAudioBuffer.numberOfChannels, Math.ceil(cleanDur*silenceAudioBuffer.sampleRate), silenceAudioBuffer.sampleRate);
-    let cursor = 0;
-    for (const seg of keepSegs) {
-      const dur = seg.end-seg.start;
-      const src = offCtx.createBufferSource();
-      src.buffer = silenceAudioBuffer; src.connect(offCtx.destination);
-      src.start(cursor, seg.start, dur); cursor += dur;
-    }
-    cleanAudioBuffer = await offCtx.startRendering();
-    const removed = detectedSilences.reduce((a,s)=>a+(s.end-s.start), 0);
-    document.getElementById('silenceRemovedTime').textContent = removed.toFixed(2)+'초';
-    const srtText = document.getElementById('silenceSrtText').value.trim();
-    if (srtText) {
-      const res = await fetch(RENDER_URL+'/api/remove_silence', {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ srt:srtText, silences:detectedSilences })
-      });
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
-      state.silence = data.srt;
-      document.getElementById('silenceAdjCount').textContent = data.count+'개';
-      renderSRT(data.srt, 'silenceSrtPreview');
-      document.getElementById('silenceSrtResultWrap').style.display='block';
-      document.getElementById('silenceDlSrt').style.display='flex';
-    } else {
-      document.getElementById('silenceAdjCount').textContent = 'SRT 없음';
-    }
-    resEl.style.display='block';
-  } catch(e) { errEl.textContent='⚠ '+e.message; errEl.style.display='block'; }
-}
-
-function downloadCleanAudio() {
-  if (!cleanAudioBuffer) return;
-  const numCh = cleanAudioBuffer.numberOfChannels;
-  const len = cleanAudioBuffer.length*numCh*2+44;
-  const buf = new ArrayBuffer(len);
-  const view = new DataView(buf);
-  let pos = 0;
-  const su32 = v => { view.setUint32(pos,v,true); pos+=4; };
-  const su16 = v => { view.setUint16(pos,v,true); pos+=2; };
-  su32(0x46464952); su32(len-8); su32(0x45564157);
-  su32(0x20746d66); su32(16); su16(1); su16(numCh);
-  su32(cleanAudioBuffer.sampleRate); su32(cleanAudioBuffer.sampleRate*2*numCh);
-  su16(numCh*2); su16(16); su32(0x61746164); su32(len-pos-4);
-  const channels = [];
-  for (let i=0;i<numCh;i++) channels.push(cleanAudioBuffer.getChannelData(i));
-  let offset = 0;
-  while (pos < len) {
-    for (let i=0;i<numCh;i++) {
-      let s = Math.max(-1,Math.min(1,channels[i][offset]));
-      s = (0.5+s<0?s*32768:s*32767)|0;
-      view.setInt16(pos,s,true); pos+=2;
-    }
-    offset++;
-  }
-  const blob = new Blob([buf],{type:'audio/wav'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob); a.download='clean_audio.wav'; a.click();
-  URL.revokeObjectURL(a.href);
-}
-</script>
-</body>
-</html>
+    <button class="tab-btn active" id="tab-
