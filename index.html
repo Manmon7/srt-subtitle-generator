@@ -408,7 +408,9 @@ footer{padding:36px 24px;border-top:1px solid var(--line);display:flex;justify-c
       </div>
       <div class="btn-row">
         <button class="btn btn-ghost" onclick="downloadCleanAudio()">⬇ 오디오 다운로드</button>
-        <button class="btn btn-accent" id="silenceDlSrt" onclick="downloadResult('silence')" style="display:none">⬇ SRT 다운로드</button>
+        <button class="btn btn-accent" function downloadResult(key) {
+  const names = { retime:'final', txt2srt:'original', silence:'adjusted' };
+  const fmtMap = { style="display:none">⬇ SRT 다운로드</button>
       </div>
     </div>
   </div>
@@ -670,7 +672,16 @@ async function copyResult(key) {
 }
 function downloadResult(key) {
   const names = { retime:'final', txt2srt:'original', silence:'adjusted' };
-  const fmtMap = {
+// silence 다운로드 시 state가 비어있으면 즉시 생성
+if (key === 'silence' && !state.silence && silenceSrtText) {
+  state.silence = adjustSubtitleLocally(silenceSrtText, detectedSilences);
+}
+if (key === 'silence' && !state.silence) {
+  alert('다운로드할 자막이 없어요. 먼저 무음 제거 후 미리보기를 실행해주세요.');
+  return;
+}
+// null 체크
+   const fmtMap = {
     retime: document.getElementById('retimeOutFmt')?.value || 'srt',
     txt2srt: document.getElementById('txt2srtOutFmt')?.value || 'srt',
     silence: document.getElementById('silenceOutFmt')?.value || 'srt'
@@ -868,6 +879,52 @@ function buildSrtFromSegs() {
 }
 
 // ══ 3. 무음 삭제 ══
+// 자막 타임스탬프 조정 (audioUtils.ts의 adjustSubtitles 로직)
+function adjustSubtitleLocally(srtText, silences) {
+  if (!srtText || !silences || silences.length === 0) return srtText;
+
+  // 각 타임스탬프에서 무음 구간만큼 차감
+  function adjustTime(t) {
+    let shift = 0;
+    for (const s of silences) {
+      if (t > s.end)        shift += s.end - s.start;
+      else if (t > s.start) shift += t - s.start;
+    }
+    return Math.max(0, t - shift);
+  }
+
+  function parseTime(str) {
+    const [hms, ms] = str.split(',');
+    const [h, m, s] = hms.split(':').map(Number);
+    return h*3600 + m*60 + s + parseInt(ms)/1000;
+  }
+
+  function formatTime(sec) {
+    sec = Math.max(0, sec);
+    const h  = Math.floor(sec/3600);
+    const m  = Math.floor((sec%3600)/60);
+    const s  = Math.floor(sec%60);
+    const ms = Math.round((sec%1)*1000);
+    return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')},${String(ms).padStart(3,'0')}`;
+  }
+
+  const blocks = srtText.trim().split(/\n\s*\n/);
+  const result = [];
+  let idx = 1;
+  for (const block of blocks) {
+    const lines = block.trim().split('\n');
+    if (lines.length < 3) continue;
+    const m = lines[1].match(/(\d{2}:\d{2}:\d{2},\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2},\d{3})/);
+    if (!m) continue;
+    const newStart = adjustTime(parseTime(m[1]));
+    const newEnd   = adjustTime(parseTime(m[2]));
+    if (newEnd > newStart) {
+      result.push(`${idx}\n${formatTime(newStart)} --> ${formatTime(newEnd)}\n${lines.slice(2).join('\n')}`);
+      idx++;
+    }
+  }
+  return result.join('\n\n');
+}
 function detectSilences() {
   if (!silenceAudioBuffer) return;
   const threshold = parseFloat(document.getElementById('silenceThreshold').value);
@@ -1280,29 +1337,12 @@ async function removeSilenceAndPlay() {
     }
     cleanAudioBuffer = await offCtx.startRendering();
 
-    // SRT 조정 (Render API)
-    let adjustedSrt = '';
-    console.log('silenceSrtText 길이:', silenceSrtText?.length, '감지된 무음:', detectedSilences.length);    
-    if (silenceSrtText) {
-      try {
-        const res = await fetch(RENDER_URL + '/api/remove_silence', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({
-            srt: silenceSrtText,
-            silences: detectedSilences,
-            input_fmt:  document.getElementById('silenceFmt')?.value || 'srt',
-            output_fmt: document.getElementById('silenceOutFmt')?.value || 'srt'
-          })
-        });
-        const data = await res.json();
-        if (!data.error) {
-  adjustedSrt = data.srt;
-  state.silence = data.srt;
-  console.log('자막 조정 완료:', data.count, '개');
+    // SRT 조정 — 브라우저에서 직접 처리 (CORS 문제 없음)
+let adjustedSrt = '';
+if (silenceSrtText) {
+  adjustedSrt = adjustSubtitleLocally(silenceSrtText, detectedSilences);
+  state.silence = adjustedSrt;
 }
-      } catch(e) { console.warn('SRT 조정 실패:', e); }
-    }
 
     // 별도 클린 플레이어 초기화
     initCleanPreviewPlayer(cleanAudioBuffer, adjustedSrt || silenceSrtText);
@@ -1321,35 +1361,37 @@ async function removeSilenceAndPlay() {
 
 async function exportSilence() {
   const errEl = document.getElementById('silenceError');
-  const resEl = document.getElementById('silenceResult');
   const btn   = document.getElementById('silenceExportBtn');
-  errEl.style.display='none'; resEl.style.display='none';
+  errEl.style.display = 'none';
 
-  if (!silenceAudioBuffer && !cleanAudioBuffer) {
-    errEl.textContent='⚠ 먼저 무음 제거 후 미리보기를 실행해주세요';
-    errEl.style.display='block'; return;
+  if (!cleanAudioBuffer && !silenceAudioBuffer) {
+    errEl.textContent = '⚠ 먼저 무음 제거 후 미리보기를 실행해주세요';
+    errEl.style.display = 'block'; return;
   }
 
   btn.disabled = true;
   btn.innerHTML = '⏳ 처리 중...';
 
   try {
-    // 클린 오디오가 없으면 생성
+    // 클린 오디오 없으면 생성
     if (!cleanAudioBuffer) {
       const totalDur = silenceAudioBuffer.duration;
       const keepSegs = [];
       let lastEnd = 0;
-      for (const s of detectedSilences) { if(s.start>lastEnd) keepSegs.push({start:lastEnd,end:s.start}); lastEnd=s.end; }
-      if (lastEnd < totalDur) keepSegs.push({start:lastEnd,end:totalDur});
-      const cleanDur = keepSegs.reduce((a,s)=>a+(s.end-s.start),0);
+      for (const s of detectedSilences) {
+        if (s.start > lastEnd) keepSegs.push({start: lastEnd, end: s.start});
+        lastEnd = s.end;
+      }
+      if (lastEnd < totalDur) keepSegs.push({start: lastEnd, end: totalDur});
+      const cleanDur = keepSegs.reduce((a,s) => a+(s.end-s.start), 0);
       const offCtx = new OfflineAudioContext(
         silenceAudioBuffer.numberOfChannels,
-        Math.ceil(cleanDur*silenceAudioBuffer.sampleRate),
+        Math.ceil(cleanDur * silenceAudioBuffer.sampleRate),
         silenceAudioBuffer.sampleRate
       );
       let cursor = 0;
       for (const seg of keepSegs) {
-        const d = seg.end-seg.start;
+        const d = seg.end - seg.start;
         const src = offCtx.createBufferSource();
         src.buffer = silenceAudioBuffer; src.connect(offCtx.destination);
         src.start(cursor, seg.start, d); cursor += d;
@@ -1357,42 +1399,28 @@ async function exportSilence() {
       cleanAudioBuffer = await offCtx.startRendering();
     }
 
-    const removed = detectedSilences.reduce((a,s)=>a+(s.end-s.start), 0);
-    document.getElementById('silenceRemovedTime').textContent = removed.toFixed(2)+'초';
-
-    // SRT 조정 (이미 state.silence에 있으면 재사용)
-    const srtTxt = document.getElementById('silenceSrtText')?.value?.trim() || silenceSrtText;
-    if (srtTxt && !state.silence) {
-      try {
-        const res = await fetch(RENDER_URL+'/api/remove_silence', {
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({
-            srt: srtTxt,
-            silences: detectedSilences,
-            input_fmt: document.getElementById('silenceFmt')?.value || 'srt',
-            output_fmt: document.getElementById('silenceOutFmt')?.value || 'srt'
-          })
-        });
-        const data = await res.json();
-        if (!data.error) { state.silence = data.srt; }
-      } catch(e) { console.warn('Render API 오류:', e); }
+    // 자막 조정 (브라우저에서 직접)
+    if (!state.silence && silenceSrtText) {
+      state.silence = adjustSubtitleLocally(silenceSrtText, detectedSilences);
     }
 
-    if (state.silence) {
-      document.getElementById('silenceAdjCount').textContent = '완료';
-      renderSRT(state.silence, 'silenceSrtPreview');
-      document.getElementById('silenceSrtResultWrap').style.display='block';
-      document.getElementById('silenceDlSrt').style.display='flex';
-    } else {
-      document.getElementById('silenceAdjCount').textContent = 'SRT 없음';
-    }
-
-    resEl.style.display='block';
+    // 오디오 다운로드
     downloadCleanAudio();
 
+    // 자막 다운로드
+    if (state.silence) {
+      const fmt = document.getElementById('silenceOutFmt')?.value || 'srt';
+      const blob = new Blob([state.silence], {type: 'text/plain;charset=utf-8'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'adjusted.' + fmt;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
   } catch(e) {
-    errEl.textContent='⚠ '+e.message;
-    errEl.style.display='block';
+    errEl.textContent = '⚠ ' + e.message;
+    errEl.style.display = 'block';
   } finally {
     btn.disabled = false;
     btn.innerHTML = '⬇ 제거된 오디오 + 자막 다운로드';
