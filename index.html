@@ -14,7 +14,7 @@ html{scroll-behavior:smooth}
 body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--white);overflow-x:hidden}
 body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:100;opacity:.3}
 
-.site-header{padding:18px 32px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:rgba(10,10,10,.92);backdrop-filter:blur(12px);z-index:50}
+.site-header{padding:18px 32px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:rgba(10,10,10,.92);backdrop-filter:blur(12px);z-index:50;position:sticky}
 .site-logo{font-family:'DM Mono',monospace;font-size:13px;letter-spacing:3px;color:var(--gold);text-decoration:none}
 .site-nav{display:flex;gap:24px}
 .site-nav a{font-size:12px;color:var(--gray);text-decoration:none;letter-spacing:.5px;transition:color .2s}
@@ -157,6 +157,10 @@ footer{padding:36px 24px;border-top:1px solid var(--line);display:flex;justify-c
 
 .fmt-select{background:var(--bg3);border:1px solid var(--line);border-radius:8px;color:var(--gold);font-family:'DM Mono',monospace;font-size:11px;padding:4px 10px;outline:none;cursor:pointer}
 .fmt-select:focus{border-color:var(--gold)}
+.lang-bar{display:flex;gap:4px;align-items:center}
+.lang-btn{padding:4px 10px;border:1px solid var(--line2);border-radius:6px;background:transparent;color:var(--gray);font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;transition:all .2s;letter-spacing:.5px}
+.lang-btn:hover{border-color:var(--gold);color:var(--gold)}
+.lang-btn.active{border-color:var(--gold);color:var(--gold);background:rgba(200,169,110,.1)}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:768px){
   .feat-grid{grid-template-columns:1fr}
@@ -171,34 +175,44 @@ footer{padding:36px 24px;border-top:1px solid var(--line);display:flex;justify-c
 <body>
 
 <header class="site-header">
-  <a href="#" class="site-logo">올인원 자동자막 생성기</a>
-  <nav class="site-nav">
-    <a href="#app">앱 사용</a>
-    <a href="#install">설치 안내</a>
-    <a href="#download">다운로드</a>
-  </nav>
+  <a href="#" class="site-logo" data-i18n="footer.brand">올인원 자동자막 생성기</a>
+  <a href="https://buymeacoffee.com/wavesrt" target="_blank" data-i18n="bmc.header"
+     style="color:var(--gold);font-size:12px;font-weight:500;text-decoration:none;display:inline-flex;align-items:center;gap:6px;opacity:.85;transition:opacity .2s;white-space:nowrap;flex-shrink:1;min-width:0;overflow:hidden;text-overflow:ellipsis;max-width:300px"
+     onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.85'">
+    ☕ 이 도구가 도움이 됐다면 커피 한 잔 사주세요
+  </a>
+  <div style="display:flex;align-items:center;gap:16px;flex-shrink:0">
+    <nav class="site-nav">
+      <a href="#app" data-i18n="nav.app">앱 사용</a>
+      <a href="#install" data-i18n="nav.install">설치 안내</a>
+      <a href="#download" data-i18n="nav.download">다운로드</a>
+    </nav>
+    <div class="lang-bar">
+      <button class="lang-btn active" data-lang="ko" onclick="applyLang('ko')">한국어</button>
+      <button class="lang-btn" data-lang="en" onclick="applyLang('en')">EN</button>
+      <button class="lang-btn" data-lang="ja" onclick="applyLang('ja')">日本語</button>
+    </div>
+  </div>
 </header>
 
 <div class="app-section" id="app">
   <div class="app-notice">
-    💡 <strong>음성 전사</strong>와 <strong>영상 무음제거</strong>는 로컬 설치 후 <a href="http://localhost:5000" target="_blank">localhost:5000</a>에서 사용하세요.
-    이 페이지에서는 <strong>싱크 합치기 · 스크립트→오리지널 자막 생성 · 무음 삭제</strong>를 설치 없이 바로 사용할 수 있어요.
-    <a href="javascript:void(0)" onclick="document.getElementById('install').scrollIntoView({behavior:'smooth'})">설치 안내 →</a>
+    <span data-i18n="notice.text">💡 <strong>음성 전사</strong>와 <strong>영상 무음제거</strong>는 로컬 설치 후 <a href="http://localhost:5000" target="_blank">localhost:5000</a>에서 사용하세요. 이 페이지에서는 <strong>싱크 합치기 · 스크립트→오리지널 자막 생성 · 무음 삭제</strong>를 설치 없이 바로 사용할 수 있어요. <a href="javascript:void(0)" onclick="document.getElementById('install').scrollIntoView({behavior:'smooth'})">설치 안내 →</a></span>
   </div>
 
   <div class="tabs">
-    <button class="tab-btn active" id="tab-txt2srt" onclick="switchTab('txt2srt')">📝 스크립트 → 오리지널 자막</button>
-    <button class="tab-btn" id="tab-retime" onclick="switchTab('retime')">🔧 싱크 합치기</button>
-    <button class="tab-btn" id="tab-silence" onclick="switchTab('silence')">✂️ 무음 삭제</button>
+    <button class="tab-btn active" id="tab-txt2srt" onclick="switchTab('txt2srt')"><span data-i18n="tab.txt2srt">📝 스크립트 → 오리지널 자막</span></button>
+    <button class="tab-btn" id="tab-retime" onclick="switchTab('retime')"><span data-i18n="tab.retime">🔧 싱크 합치기</span></button>
+    <button class="tab-btn" id="tab-silence" onclick="switchTab('silence')"><span data-i18n="tab.silence">✂️ 무음 삭제</span></button>
   </div>
 
   <!-- 패널 1: 싱크 합치기 -->
   <div class="panel" id="panel-retime">
     <div class="card">
-      <div class="card-title">Whisper SRT (타이밍 O, 오타 X)</div>
+      <div class="card-title" data-i18n="retime.whisper.title">Whisper SRT (타이밍 O, 오타 X)</div>
       <div class="srt-dropzone" id="dz-whisper">
         <div class="srt-dz-header">
-          <span>WHISPER 자막</span>
+          <span data-i18n="retime.whisper.label">WHISPER 자막</span>
           <div style="display:flex;align-items:center;gap:8px">
             <select class="fmt-select" id="whisperFmt" onchange="updateSrtAccept('whisperFile',this.value)">
               <option value="srt">.srt</option>
@@ -207,17 +221,17 @@ footer{padding:36px 24px;border-top:1px solid var(--line);display:flex;justify-c
               <option value="ssa">.ssa</option>
               <option value="sbv">.sbv</option>
             </select>
-            <label>📂 파일 열기<input type="file" id="whisperFile" accept=".srt,.vtt,.ass,.ssa,.sbv" onchange="loadSubtitleFile(this,'whisperSrtText','whisperFmt')"></label>
+            <label data-i18n="file.open">📂 파일 열기<input type="file" id="whisperFile" accept=".srt,.vtt,.ass,.ssa,.sbv" onchange="loadSubtitleFile(this,'whisperSrtText','whisperFmt')"></label>
           </div>
         </div>
-        <textarea class="srt-textarea" id="whisperSrtText" placeholder="Whisper SRT를 붙여넣거나 파일을 드래그 / 클릭해서 열어주세요"></textarea>
+        <textarea class="srt-textarea" id="whisperSrtText" data-i18n-ph="retime.whisper.ph" placeholder="Whisper SRT를 붙여넣거나 파일을 드래그 / 클릭해서 열어주세요"></textarea>
       </div>
     </div>
     <div class="card">
-      <div class="card-title">원문 SRT (텍스트 O, 타이밍 X)</div>
+      <div class="card-title" data-i18n="retime.original.title">원문 SRT (텍스트 O, 타이밍 X)</div>
       <div class="srt-dropzone" id="dz-original">
         <div class="srt-dz-header">
-          <span>원문 자막</span>
+          <span data-i18n="retime.original.label">원문 자막</span>
           <div style="display:flex;align-items:center;gap:8px">
             <select class="fmt-select" id="originalFmt" onchange="updateSrtAccept('originalFile',this.value)">
               <option value="srt">.srt</option>
@@ -226,14 +240,14 @@ footer{padding:36px 24px;border-top:1px solid var(--line);display:flex;justify-c
               <option value="ssa">.ssa</option>
               <option value="sbv">.sbv</option>
             </select>
-            <label>📂 파일 열기<input type="file" id="originalFile" accept=".srt,.vtt,.ass,.ssa,.sbv" onchange="loadSubtitleFile(this,'originalSrtText','originalFmt')"></label>
+            <label data-i18n="file.open">📂 파일 열기<input type="file" id="originalFile" accept=".srt,.vtt,.ass,.ssa,.sbv" onchange="loadSubtitleFile(this,'originalSrtText','originalFmt')"></label>
           </div>
         </div>
-        <textarea class="srt-textarea" id="originalSrtText" placeholder="원문 SRT를 붙여넣거나 파일을 드래그 / 클릭해서 열어주세요"></textarea>
+        <textarea class="srt-textarea" id="originalSrtText" data-i18n-ph="retime.original.ph" placeholder="원문 SRT를 붙여넣거나 파일을 드래그 / 클릭해서 열어주세요"></textarea>
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-      <span style="font-size:12px;color:var(--gray)">출력 형식:</span>
+      <span style="font-size:12px;color:var(--gray)" data-i18n="retime.outfmt">출력 형식:</span>
       <select class="fmt-select" id="retimeOutFmt">
         <option value="srt">.srt</option>
         <option value="vtt">.vtt</option>
@@ -242,7 +256,7 @@ footer{padding:36px 24px;border-top:1px solid var(--line);display:flex;justify-c
         <option value="txt">.txt</option>
       </select>
     </div>
-    <button class="btn btn-primary" onclick="retimeSRT()">🔧 타이밍 재배분하기</button>
+    <button class="btn btn-primary" onclick="retimeSRT()"><span data-i18n="retime.btn">🔧 타이밍 재배분하기</span></button>
     <div class="error-box" id="retimeError"></div>
     <div class="result-section" id="retimeResult">
       <div class="result-meta">
@@ -264,25 +278,25 @@ footer{padding:36px 24px;border-top:1px solid var(--line);display:flex;justify-c
   <!-- 패널 2: 텍스트 → SRT -->
   <div class="panel active" id="panel-txt2srt">
     <div class="card">
-      <div class="card-title">원문 텍스트 입력</div>
-      <textarea id="rawText" placeholder="원문 텍스트를 입력하세요. 엔터로 직접 줄을 나눌 수도 있어요." style="min-height:160px"></textarea>
+      <div class="card-title" data-i18n="txt2srt.card1">원문 텍스트 입력</div>
+      <textarea id="rawText" data-i18n-ph="txt2srt.placeholder" placeholder="원문 텍스트를 입력하세요. 엔터로 직접 줄을 나눌 수도 있어요." style="min-height:160px"></textarea>
       <div class="grid2" style="margin-top:14px">
         <div>
-          <label class="field-label">최대 글자 수 (한글 기준)</label>
+          <label class="field-label" data-i18n="txt2srt.maxchars">최대 글자 수 (한글 기준)</label>
           <input type="number" id="txt2srtMaxChars" value="10" min="5" max="30">
         </div>
         <div>
-          <label class="field-label">영상 총 길이 (초, 타임스탬프 계산용)</label>
-          <input type="number" id="txt2srtDuration" value="60" min="1" step="1" placeholder="예: 63">
+          <label class="field-label" data-i18n="txt2srt.duration">영상 총 길이 (초, 타임스탬프 계산용)</label>
+          <input type="number" id="txt2srtDuration" value="60" min="1" step="1" data-i18n-ph="txt2srt.duration.ph" placeholder="예: 63">
         </div>
         <div>
-          <label class="field-label">출력 자막 형식</label>
+          <label class="field-label" data-i18n="txt2srt.outfmt">출력 자막 형식</label>
           <select class="fmt-select" id="txt2srtOutFmt" style="width:100%;padding:10px 14px;font-size:13px">
-            <option value="srt">.srt (일반)</option>
-            <option value="vtt">.vtt (WebVTT / YouTube)</option>
-            <option value="ass">.ass (고급 스타일)</option>
-            <option value="sbv">.sbv (YouTube)</option>
-            <option value="txt">.txt (텍스트만)</option>
+            <option value="srt" data-i18n-opt="fmt.srt">.srt (일반)</option>
+            <option value="vtt" data-i18n-opt="fmt.vtt">.vtt (WebVTT / YouTube)</option>
+            <option value="ass" data-i18n-opt="fmt.ass">.ass (고급 스타일)</option>
+            <option value="sbv" data-i18n-opt="fmt.sbv">.sbv (YouTube)</option>
+            <option value="txt" data-i18n-opt="fmt.txt">.txt (텍스트만)</option>
           </select>
         </div>
       </div>
@@ -300,7 +314,7 @@ footer{padding:36px 24px;border-top:1px solid var(--line);display:flex;justify-c
         <button class="btn btn-primary" onclick="buildSrtFromSegs()" style="flex:2">📝 SRT 생성</button>
       </div>
     </div>
-    <button class="btn btn-primary" id="txt2srtBtn" onclick="convertTxt()">📝 자동 분절 후 편집</button>
+    <button class="btn btn-primary" id="txt2srtBtn" onclick="convertTxt()"><span data-i18n="txt2srt.btn">📝 자동 분절 후 편집</span></button>
     <div class="error-box" id="txt2srtError"></div>
     <div class="result-section" id="txt2srtResult">
       <div class="result-meta">
@@ -320,44 +334,44 @@ footer{padding:36px 24px;border-top:1px solid var(--line);display:flex;justify-c
 
   <!-- 패널 3: 무음 삭제 -->
   <div class="panel" id="panel-silence">
-    <div style="background:rgba(74,144,217,.06);border:1px solid rgba(74,144,217,.25);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:var(--gray);line-height:1.7">
+    <div style="background:rgba(74,144,217,.06);border:1px solid rgba(74,144,217,.25);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:var(--gray);line-height:1.7" data-i18n="silence.video.notice">
       📹 <strong style="color:var(--blue)">영상 무음삭제</strong>는 로컬에서 진행해주세요.
       <a href="http://localhost:5000" target="_blank" style="color:var(--blue);margin-left:4px">localhost:5000 →</a>
     </div>
     <div class="card">
-      <div class="card-title">오디오 + SRT 동시 첨부 (드래그 가능)</div>
+      <div class="card-title" data-i18n="silence.upload.title">오디오 + SRT 동시 첨부 (드래그 가능)</div>
       <div class="dropzone" id="dz-silence" style="min-height:120px">
         <input type="file" id="silenceMultiFile" accept="audio/*,video/*,.srt" multiple onchange="handleSilenceFiles(this.files)">
         <div class="dz-icon">✂️</div>
-        <div class="dz-title">오디오 파일 + 자막 파일을 함께 드래그하거나 클릭해서 선택</div>
-        <div class="dz-sub">오디오: MP3, WAV, M4A 등 · 자막: .srt .vtt .ass .sbv (선택사항)</div>
+        <div class="dz-title" data-i18n="silence.upload.dztitle">오디오 파일 + 자막 파일을 함께 드래그하거나 클릭해서 선택</div>
+        <div class="dz-sub" data-i18n="silence.upload.sub">오디오: MP3, WAV, M4A 등 · 자막: .srt .vtt .ass .sbv (선택사항)</div>
         <div id="silenceFileChips" style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px"></div>
       </div>
     </div>
     <div class="card" id="silenceSettings" style="display:none">
-      <div class="card-title">무음 감지 설정</div>
+      <div class="card-title" data-i18n="silence.settings.title">무음 감지 설정</div>
       <div class="grid2">
         <div>
-          <label class="field-label">감지 임계값 (높을수록 더 많이 감지)</label>
+          <label class="field-label" data-i18n="silence.threshold">감지 임계값 (높을수록 더 많이 감지)</label>
           <input type="number" id="silenceThreshold" value="0.015" step="0.001" min="0.001" max="0.1">
         </div>
         <div>
-          <label class="field-label">최소 무음 길이 (초)</label>
+          <label class="field-label" data-i18n="silence.mindur">최소 무음 길이 (초)</label>
           <input type="number" id="silenceMinDur" value="0.2" step="0.05" min="0.05" max="2.0">
         </div>
       </div>
-      <button class="btn btn-accent" onclick="detectSilences()" style="margin-top:14px;width:100%;justify-content:center">🔍 무음 구간 감지</button>
+      <button class="btn btn-accent" onclick="detectSilences()" style="margin-top:14px;width:100%;justify-content:center"><span data-i18n="silence.detect">🔍 무음 구간 감지</span></button>
       <div id="silenceList" class="silence-list"></div>
       <div id="silenceStats" style="display:none;margin-top:10px;font-size:12px;color:var(--gray)"></div>
     </div>
 
-    <!-- 원본 오디오 미리보기 (무음 구간 확인용) -->
+    <!-- 원본 오디오 미리보기 -->
     <div class="card" id="silencePreviewCard" style="display:none">
       <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
-        <span>원본 오디오 미리보기 (빨간 구간 = 무음)</span>
+        <span data-i18n="silence.preview.orig">원본 오디오 미리보기 (빨간 구간 = 무음)</span>
         <div style="display:flex;gap:8px;align-items:center">
           <span id="previewTime" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--blue)">00:00.00</span>
-          <button class="btn btn-ghost" id="previewPlayBtn" onclick="togglePreview()" style="padding:8px 16px;font-size:13px">▶ 재생</button>
+          <button class="btn btn-ghost" id="previewPlayBtn" onclick="togglePreview()" style="padding:8px 16px;font-size:13px" data-i18n="silence.play">▶ 재생</button>
         </div>
       </div>
       <div style="position:relative;margin-bottom:12px">
@@ -365,18 +379,18 @@ footer{padding:36px 24px;border-top:1px solid var(--line);display:flex;justify-c
       </div>
       <div id="currentSubtitleDisplay" style="min-height:40px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 16px;font-size:14px;color:var(--white);text-align:center;display:none"></div>
       <div style="margin-top:8px;display:flex;gap:12px;font-size:11px;color:var(--gray);font-family:'DM Mono',monospace">
-        <span>■ <span style="color:rgba(232,71,71,.6)">빨간 구간</span> = 무음</span>
-        <span>■ <span style="color:var(--blue)">파란 선</span> = 현재 위치</span>
+        <span data-i18n="silence.legend.red">■ <span style="color:rgba(232,71,71,.6)">빨간 구간</span> = 무음</span>
+        <span data-i18n="silence.legend.blue">■ <span style="color:var(--blue)">파란 선</span> = 현재 위치</span>
       </div>
     </div>
 
-    <!-- 무음 제거 후 미리보기 (별도 플레이어) -->
+    <!-- 무음 제거 후 미리보기 -->
     <div class="card" id="cleanPreviewCard" style="display:none;border-color:rgba(71,197,160,.3);background:rgba(71,197,160,.03)">
       <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
-        <span style="color:var(--green)">✅ 무음 제거된 오디오 미리보기</span>
+        <span style="color:var(--green)" data-i18n="silence.preview.clean">✅ 무음 제거된 오디오 미리보기</span>
         <div style="display:flex;gap:8px;align-items:center">
           <span id="cleanPreviewTime" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--green)">00:00.00</span>
-          <button class="btn btn-accent" id="cleanPlayBtn" onclick="toggleCleanPreview()" style="padding:8px 16px;font-size:13px">▶ 재생</button>
+          <button class="btn btn-accent" id="cleanPlayBtn" onclick="toggleCleanPreview()" style="padding:8px 16px;font-size:13px" data-i18n="silence.play">▶ 재생</button>
         </div>
       </div>
       <div style="position:relative;margin-bottom:12px">
@@ -386,7 +400,7 @@ footer{padding:36px 24px;border-top:1px solid var(--line);display:flex;justify-c
     </div>
 
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-      <span style="font-size:12px;color:var(--gray)">출력 자막 형식:</span>
+      <span style="font-size:12px;color:var(--gray)" data-i18n="silence.outfmt">출력 자막 형식:</span>
       <select class="fmt-select" id="silenceOutFmt">
         <option value="srt">.srt</option>
         <option value="vtt">.vtt</option>
@@ -394,8 +408,8 @@ footer{padding:36px 24px;border-top:1px solid var(--line);display:flex;justify-c
         <option value="sbv">.sbv</option>
       </select>
     </div>
-    <button class="btn btn-primary" id="silenceRemoveBtn" onclick="removeSilenceAndPlay()" style="display:none;width:100%;justify-content:center;margin-top:8px">▶ 무음 제거 후 미리보기</button>
-    <button class="btn btn-accent" id="silenceExportBtn" onclick="exportSilence()" style="display:none;width:100%;justify-content:center;margin-top:8px">⬇ 제거된 오디오 + 자막 다운로드</button>
+    <button class="btn btn-primary" id="silenceRemoveBtn" onclick="removeSilenceAndPlay()" style="display:none;width:100%;justify-content:center;margin-top:8px"><span data-i18n="silence.preview.btn">▶ 무음 제거 후 미리보기</span></button>
+    <button class="btn btn-accent" id="silenceExportBtn" onclick="exportSilence()" style="display:none;width:100%;justify-content:center;margin-top:8px"><span data-i18n="silence.export.btn">⬇ 제거된 오디오 + 자막 다운로드</span></button>
     <div class="error-box" id="silenceError"></div>
     <div class="result-section" id="silenceResult">
       <div class="result-meta">
@@ -419,101 +433,179 @@ footer{padding:36px 24px;border-top:1px solid var(--line);display:flex;justify-c
 <!-- 워크플로우 -->
 <div style="max-width:860px;margin:0 auto;padding:0 24px 48px">
   <div style="background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:28px 32px">
-    <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:24px">쇼츠 / 영상 제작 3단계 워크플로우</div>
-    <div style="display:flex;gap:0;position:relative">
-      <!-- 연결선 -->
-      <div style="position:absolute;top:20px;left:20px;right:20px;height:1px;background:linear-gradient(to right,var(--gold),var(--line2),var(--line2));z-index:0"></div>
-      <!-- Step 1 -->
-      <div style="flex:1;position:relative;z-index:1;padding-right:16px">
-        <div style="width:40px;height:40px;border-radius:50%;background:var(--gold);color:#0a0a0a;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:12px;font-weight:700;margin-bottom:14px">01</div>
-        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:6px">로컬</div>
-        <div style="font-size:13px;font-weight:600;margin-bottom:8px;line-height:1.3">음성 추출 및<br>자막 생성</div>
-        <div style="font-size:12px;color:var(--gray);line-height:1.7">개인 PC에서 Whisper AI로 보안 걱정 없이 음성을 자막파일로 변환합니다.</div>
-        <a href="http://localhost:5000" target="_blank" style="display:inline-block;margin-top:10px;font-family:'DM Mono',monospace;font-size:10px;color:var(--blue);text-decoration:none;border:1px solid rgba(74,144,217,.3);border-radius:6px;padding:4px 10px">localhost:5000 →</a>
+    <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:6px" data-i18n="workflow.title">쇼츠 / 영상 제작 워크플로우</div>
+    <div style="font-size:12px;color:var(--gray);margin-bottom:16px" data-i18n="workflow.subtitle">미디어 종류에 따라 다른 경로를 선택하세요</div>
+
+    <!-- 배지 범례 -->
+    <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;align-items:center">
+      <span style="display:inline-flex;align-items:center;font-family:'DM Mono',monospace;font-size:10px;padding:3px 10px;border-radius:99px;background:rgba(200,169,110,.15);border:1px solid rgba(200,169,110,.4);color:var(--gold)">💻 LOCAL</span>
+      <span style="font-size:11px;color:var(--gray)" data-i18n="workflow.badge.local.desc">= 개인 PC (localhost:5000)</span>
+      <span style="display:inline-flex;align-items:center;font-family:'DM Mono',monospace;font-size:10px;padding:3px 10px;border-radius:99px;background:rgba(71,197,232,.12);border:1px solid rgba(71,197,232,.3);color:#47c5e8;margin-left:14px">🌐 WEB</span>
+      <span style="font-size:11px;color:var(--gray)" data-i18n="workflow.badge.web.desc">= 이 페이지</span>
+    </div>
+
+    <!-- 탭 -->
+    <div style="display:flex;gap:8px;margin-bottom:22px">
+      <button id="wf-tab-audio" onclick="switchWfTab('audio')"
+        style="padding:8px 16px;border-radius:8px;border:1px solid var(--gold);background:rgba(200,169,110,.15);color:var(--gold);font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;font-weight:700">
+        🎧 <span data-i18n="workflow.tab.audio">오디오 + 자막</span>
+      </button>
+      <button id="wf-tab-video" onclick="switchWfTab('video')"
+        style="padding:8px 16px;border-radius:8px;border:1px solid var(--line2);background:transparent;color:var(--gray);font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;font-weight:400">
+        🎬 <span data-i18n="workflow.tab.video">영상 + 자막</span>
+      </button>
+    </div>
+
+    <!-- 오디오 워크플로우 (3단계) -->
+    <div id="wf-audio">
+      <div style="display:flex;gap:0;position:relative">
+        <div style="position:absolute;top:20px;left:20px;right:20px;height:1px;background:linear-gradient(to right,var(--gold),#47c5e8,#47c5e8);z-index:0"></div>
+        <div style="flex:1;position:relative;z-index:1;padding-right:16px">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--gold);color:#0a0a0a;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:12px;font-weight:700;margin-bottom:12px">01</div>
+          <span style="display:inline-flex;font-family:'DM Mono',monospace;font-size:9px;padding:2px 8px;border-radius:99px;background:rgba(200,169,110,.15);border:1px solid rgba(200,169,110,.4);color:var(--gold);margin-bottom:8px">💻 LOCAL</span>
+          <div style="font-size:13px;font-weight:600;margin-bottom:6px;line-height:1.3" data-i18n="workflow.step1.title">음성 추출 및<br>자막 생성</div>
+          <div style="font-size:12px;color:var(--gray);line-height:1.7" data-i18n="workflow.step1.desc">개인 PC에서 Whisper AI로 음성을 자막파일로 변환합니다.</div>
+          <a href="http://localhost:5000" target="_blank" style="display:inline-block;margin-top:10px;font-family:'DM Mono',monospace;font-size:10px;color:var(--blue);text-decoration:none;border:1px solid rgba(74,144,217,.3);border-radius:6px;padding:4px 10px">localhost:5000 →</a>
+        </div>
+        <div style="flex:1;position:relative;z-index:1;padding:0 16px">
+          <div style="width:40px;height:40px;border-radius:50%;background:rgba(71,197,232,.2);border:2px solid rgba(71,197,232,.5);color:#47c5e8;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:12px;font-weight:700;margin-bottom:12px">02</div>
+          <span style="display:inline-flex;font-family:'DM Mono',monospace;font-size:9px;padding:2px 8px;border-radius:99px;background:rgba(71,197,232,.12);border:1px solid rgba(71,197,232,.3);color:#47c5e8;margin-bottom:8px">🌐 WEB</span>
+          <div style="font-size:13px;font-weight:600;margin-bottom:6px;line-height:1.3" data-i18n="workflow.step2.title">대본 최적화 및<br>싱크 결합</div>
+          <div style="font-size:12px;color:var(--gray);line-height:1.7" data-i18n="workflow.step2.desc">오리지널 자막을 생성하고 Whisper 자막과 매칭해 정확한 싱크를 완성합니다.</div>
+          <button onclick="goToTab('retime')" style="margin-top:10px;font-family:'DM Mono',monospace;font-size:10px;color:var(--green);background:none;border:1px solid rgba(71,197,160,.3);border-radius:6px;padding:4px 10px;cursor:pointer" data-i18n="workflow.step2.btn">싱크 합치기 →</button>
+        </div>
+        <div style="flex:1;position:relative;z-index:1;padding-left:16px">
+          <div style="width:40px;height:40px;border-radius:50%;background:rgba(71,197,232,.2);border:2px solid rgba(71,197,232,.5);color:#47c5e8;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:12px;font-weight:700;margin-bottom:12px">03</div>
+          <span style="display:inline-flex;font-family:'DM Mono',monospace;font-size:9px;padding:2px 8px;border-radius:99px;background:rgba(71,197,232,.12);border:1px solid rgba(71,197,232,.3);color:#47c5e8;margin-bottom:8px">🌐 WEB</span>
+          <div style="font-size:13px;font-weight:600;margin-bottom:6px;line-height:1.3" data-i18n="workflow.step3.title">무음 구간<br>자동 컷편집</div>
+          <div style="font-size:12px;color:var(--gray);line-height:1.7" data-i18n="workflow.step3.desc">완성된 자막 기준으로 무음 구간을 감지하고 한 번에 삭제합니다.</div>
+          <button onclick="goToTab('silence')" style="margin-top:10px;font-family:'DM Mono',monospace;font-size:10px;color:#47c5e8;background:none;border:1px solid rgba(71,197,232,.3);border-radius:6px;padding:4px 10px;cursor:pointer" data-i18n="workflow.step3.btn">무음 삭제 →</button>
+        </div>
       </div>
-      <!-- Step 2 -->
-      <div style="flex:1;position:relative;z-index:1;padding:0 16px">
-        <div style="width:40px;height:40px;border-radius:50%;background:var(--bg3);border:2px solid var(--line2);color:var(--white);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:12px;font-weight:700;margin-bottom:14px">02</div>
-        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--gray2);text-transform:uppercase;margin-bottom:6px">웹</div>
-        <div style="font-size:13px;font-weight:600;margin-bottom:8px;line-height:1.3">대본 최적화 및<br>싱크 결합</div>
-        <div style="font-size:12px;color:var(--gray);line-height:1.7">오리지널 자막을 생성하고 오리지널 자막과 Whisper 자막을 매칭해 정확한 싱크를 완성합니다.</div>
-        <button onclick="goToTab('retime')" style="margin-top:10px;font-family:'DM Mono',monospace;font-size:10px;color:var(--green);background:none;border:1px solid rgba(71,197,160,.3);border-radius:6px;padding:4px 10px;cursor:pointer">싱크 합치기 →</button>
-      </div>
-      <!-- Step 3 -->
-      <div style="flex:1;position:relative;z-index:1;padding-left:16px">
-        <div style="width:40px;height:40px;border-radius:50%;background:var(--bg3);border:2px solid var(--line2);color:var(--white);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:12px;font-weight:700;margin-bottom:14px">03</div>
-        <div style="font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--gray2);text-transform:uppercase;margin-bottom:6px">웹</div>
-        <div style="font-size:13px;font-weight:600;margin-bottom:8px;line-height:1.3">무음 구간<br>자동 컷편집</div>
-        <div style="font-size:12px;color:var(--gray);line-height:1.7">완성된 자막 기준으로 무음 구간을 감지하고 한 번에 삭제합니다.</div>
-        <button onclick="goToTab('silence')" style="margin-top:10px;font-family:'DM Mono',monospace;font-size:10px;color:var(--gray);background:none;border:1px solid var(--line);border-radius:6px;padding:4px 10px;cursor:pointer">무음 삭제 →</button>
+    </div>
+
+    <!-- 영상 워크플로우 (4단계) -->
+    <div id="wf-video" style="display:none">
+      <div style="display:flex;gap:0;position:relative">
+        <div style="position:absolute;top:20px;left:20px;right:20px;height:1px;background:linear-gradient(to right,var(--gold),#47c5e8 40%,var(--gold) 65%,var(--gold));z-index:0"></div>
+        <div style="flex:1;position:relative;z-index:1;padding-right:10px">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--gold);color:#0a0a0a;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:12px;font-weight:700;margin-bottom:12px">01</div>
+          <span style="display:inline-flex;font-family:'DM Mono',monospace;font-size:9px;padding:2px 8px;border-radius:99px;background:rgba(200,169,110,.15);border:1px solid rgba(200,169,110,.4);color:var(--gold);margin-bottom:8px">💻 LOCAL</span>
+          <div style="font-size:13px;font-weight:600;margin-bottom:6px;line-height:1.3" data-i18n="workflow.v.step1.title">음성 추출 및<br>자막 생성</div>
+          <div style="font-size:12px;color:var(--gray);line-height:1.7" data-i18n="workflow.v.step1.desc">Whisper AI로 영상에서 음성을 추출해 자막을 생성합니다.</div>
+          <a href="http://localhost:5000" target="_blank" style="display:inline-block;margin-top:10px;font-family:'DM Mono',monospace;font-size:10px;color:var(--blue);text-decoration:none;border:1px solid rgba(74,144,217,.3);border-radius:6px;padding:4px 10px">localhost:5000 →</a>
+        </div>
+        <div style="flex:1;position:relative;z-index:1;padding:0 10px">
+          <div style="width:40px;height:40px;border-radius:50%;background:rgba(71,197,232,.2);border:2px solid rgba(71,197,232,.5);color:#47c5e8;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:12px;font-weight:700;margin-bottom:12px">02</div>
+          <span style="display:inline-flex;font-family:'DM Mono',monospace;font-size:9px;padding:2px 8px;border-radius:99px;background:rgba(71,197,232,.12);border:1px solid rgba(71,197,232,.3);color:#47c5e8;margin-bottom:8px">🌐 WEB</span>
+          <div style="font-size:13px;font-weight:600;margin-bottom:6px;line-height:1.3" data-i18n="workflow.v.step2.title">대본 최적화 및<br>싱크 결합</div>
+          <div style="font-size:12px;color:var(--gray);line-height:1.7" data-i18n="workflow.v.step2.desc">오리지널 자막을 생성하고 Whisper 자막과 매칭해 싱크를 완성합니다.</div>
+          <button onclick="goToTab('retime')" style="margin-top:10px;font-family:'DM Mono',monospace;font-size:10px;color:var(--green);background:none;border:1px solid rgba(71,197,160,.3);border-radius:6px;padding:4px 10px;cursor:pointer" data-i18n="workflow.step2.btn">싱크 합치기 →</button>
+        </div>
+        <div style="flex:1;position:relative;z-index:1;padding:0 10px">
+          <div style="width:40px;height:40px;border-radius:50%;background:rgba(200,169,110,.15);border:2px solid var(--gold);color:var(--gold);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:12px;font-weight:700;margin-bottom:12px">03</div>
+          <span style="display:inline-flex;font-family:'DM Mono',monospace;font-size:9px;padding:2px 8px;border-radius:99px;background:rgba(200,169,110,.15);border:1px solid rgba(200,169,110,.4);color:var(--gold);margin-bottom:8px">💻 LOCAL</span>
+          <div style="font-size:13px;font-weight:600;margin-bottom:6px;line-height:1.3" data-i18n="workflow.v.step3.title">영상 무음 삭제<br><span style="font-size:11px;font-weight:400;color:var(--gray)">(로컬로 복귀)</span></div>
+          <div style="font-size:12px;color:var(--gray);line-height:1.7" data-i18n="workflow.v.step3.desc">영상 파일은 로컬에서 처리합니다. 완성된 싱크 자막을 넣으면 타임스탬프도 자동 조정됩니다.</div>
+          <a href="http://localhost:5000" target="_blank" style="display:inline-block;margin-top:10px;font-family:'DM Mono',monospace;font-size:10px;color:var(--blue);text-decoration:none;border:1px solid rgba(74,144,217,.3);border-radius:6px;padding:4px 10px" data-i18n="workflow.v.step3.btn">영상 무음 삭제 →</a>
+        </div>
+        <div style="flex:1;position:relative;z-index:1;padding-left:10px">
+          <div style="width:40px;height:40px;border-radius:50%;background:rgba(71,197,160,.08);border:2px dashed rgba(71,197,160,.35);color:var(--green);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:12px;font-weight:700;margin-bottom:12px">04</div>
+          <span style="display:inline-flex;font-family:'DM Mono',monospace;font-size:9px;padding:2px 8px;border-radius:99px;background:rgba(71,197,232,.12);border:1px dashed rgba(71,197,232,.3);color:#47c5e8;margin-bottom:8px">🌐 WEB</span>
+          <div style="font-size:13px;font-weight:600;margin-bottom:6px;line-height:1.3" data-i18n="workflow.v.step4.title">자막 미세 조정<br><span style="font-size:11px;font-weight:400;color:var(--gray)">(선택)</span></div>
+          <div style="font-size:12px;color:var(--gray);line-height:1.7" data-i18n="workflow.v.step4.desc">조정된 자막을 웹에서 추가 편집하거나 형식 변환할 수 있습니다.</div>
+          <button onclick="goToTab('txt2srt')" style="margin-top:10px;font-family:'DM Mono',monospace;font-size:10px;color:var(--gray);background:none;border:1px dashed var(--line2);border-radius:6px;padding:4px 10px;cursor:pointer" data-i18n="workflow.v.step4.btn">스크립트 편집 →</button>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
+<script>
+function switchWfTab(tab) {
+  const isAudio = tab === 'audio';
+  document.getElementById('wf-audio').style.display = isAudio ? 'block' : 'none';
+  document.getElementById('wf-video').style.display = isAudio ? 'none' : 'block';
+  const at = document.getElementById('wf-tab-audio'), vt = document.getElementById('wf-tab-video');
+  at.style.borderColor = isAudio ? 'var(--gold)' : 'var(--line2)';
+  at.style.background  = isAudio ? 'rgba(200,169,110,.15)' : 'transparent';
+  at.style.color       = isAudio ? 'var(--gold)' : 'var(--gray)';
+  at.style.fontWeight  = isAudio ? '700' : '400';
+  vt.style.borderColor = isAudio ? 'var(--line2)' : 'var(--gold)';
+  vt.style.background  = isAudio ? 'transparent' : 'rgba(200,169,110,.15)';
+  vt.style.color       = isAudio ? 'var(--gray)' : 'var(--gold)';
+  vt.style.fontWeight  = isAudio ? '400' : '700';
+}
+</script>
+
 <!-- 랜딩 -->
 <div class="divider-section">
 <section class="hero">
-  <p class="hero-eyebrow">Free · Local AI · No API Key · Multi-Format</p>
-  <h1>올인원<span>자동자막 생성기</span></h1>
-  <p class="hero-sub">Whisper AI가 음성을 전사하고, 원문 스크립트와 타이밍을 자동으로 싱크합니다.</p>
+  <p class="hero-eyebrow"><span data-i18n="hero.eyebrow">Free · Local AI · No API Key · Multi-Format</span></p>
+  <h1 data-i18n="hero.title">올인원<span>자동자막 생성기</span></h1>
+  <p class="hero-sub"><span data-i18n="hero.sub">Whisper AI가 음성을 전사하고, 원문 스크립트와 타이밍을 자동으로 싱크합니다.</span></p>
   <div class="hero-btns">
-    <a href="#app" class="btn-lp btn-lp-gold">⬆ 앱 바로 사용</a>
-    <a href="#download" class="btn-lp btn-lp-outline">⬇ 다운로드</a>
+    <a href="#app" class="btn-lp btn-lp-gold"><span data-i18n="hero.use">⬆ 앱 바로 사용</span></a>
+    <a href="#download" class="btn-lp btn-lp-outline"><span data-i18n="hero.dl">⬇ 다운로드</span></a>
   </div>
 </section>
 <section class="features">
-  <div class="sec-label">핵심 기능</div>
+  <div class="sec-label" data-i18n="feat.title">핵심 기능</div>
   <div class="feat-grid">
-    <div class="feat-item"><span class="feat-num">01</span><h3 class="feat-title">Whisper AI 자동 전사</h3><p class="feat-desc">로컬 Whisper AI로 음성을 전사하고 자연스럽게 분절합니다.</p></div>
-    <div class="feat-item"><span class="feat-num">02</span><h3 class="feat-title">스크립트 → 오리지널 자막</h3><p class="feat-desc">스크립트를 자막 형식으로 자동 분절. 글자 수 기준 타임스탬프 자동 부여.</p></div>
-    <div class="feat-item"><span class="feat-num">03</span><h3 class="feat-title">원문 스크립트 싱크</h3><p class="feat-desc">Whisper 타이밍 + 오리지널 자막을 자동 매핑. 오타 없는 정확한 자막.</p></div>
-    <div class="feat-item"><span class="feat-num">04</span><h3 class="feat-title">무음 구간 제거</h3><p class="feat-desc">호흡, 무음 감지 후 제거. 오디오/영상과 자막이 함께 조정됩니다.</p></div>
-    <div class="feat-item"><span class="feat-num">05</span><h3 class="feat-title">다양한 자막 형식</h3><p class="feat-desc">SRT, VTT, ASS, SBV 등 모든 편집 프로그램 호환 형식 지원.</p></div>
-    <div class="feat-item"><span class="feat-num">06</span><h3 class="feat-title">완전 무료</h3><p class="feat-desc">구독 없음. 데이터 외부 전송 없음. API 키 불필요.</p></div>
+    <div class="feat-item"><span class="feat-num">01</span><h3 class="feat-title" data-i18n="feat1.title">Whisper AI 자동 전사</h3><p class="feat-desc" data-i18n="feat1.desc">로컬 Whisper AI로 음성을 전사하고 자연스럽게 분절합니다.</p></div>
+    <div class="feat-item"><span class="feat-num">02</span><h3 class="feat-title" data-i18n="feat2.title">스크립트 → 오리지널 자막</h3><p class="feat-desc" data-i18n="feat2.desc">스크립트를 자막 형식으로 자동 분절. 글자 수 기준 타임스탬프 자동 부여.</p></div>
+    <div class="feat-item"><span class="feat-num">03</span><h3 class="feat-title" data-i18n="feat3.title">원문 스크립트 싱크</h3><p class="feat-desc" data-i18n="feat3.desc">Whisper 타이밍 + 오리지널 자막을 자동 매핑. 오타 없는 정확한 자막.</p></div>
+    <div class="feat-item"><span class="feat-num">04</span><h3 class="feat-title" data-i18n="feat4.title">무음 구간 제거</h3><p class="feat-desc" data-i18n="feat4.desc">호흡, 무음 감지 후 제거. 오디오/영상과 자막이 함께 조정됩니다.</p></div>
+    <div class="feat-item"><span class="feat-num">05</span><h3 class="feat-title" data-i18n="feat5.title">다양한 자막 형식</h3><p class="feat-desc" data-i18n="feat5.desc">SRT, VTT, ASS, SBV 등 모든 편집 프로그램 호환 형식 지원.</p></div>
+    <div class="feat-item"><span class="feat-num">06</span><h3 class="feat-title" data-i18n="feat6.title">완전 무료</h3><p class="feat-desc" data-i18n="feat6.desc">구독 없음. 데이터 외부 전송 없음. API 키 불필요.</p></div>
   </div>
 </section>
 <section class="compare">
   <div class="compare-inner">
-    <h2 class="compare-title">왜 <em>올인원 자동자막 생성기</em>인가요?</h2>
+    <h2 class="compare-title" data-i18n="compare.title">왜 <em>올인원 자동자막 생성기</em>인가요?</h2>
     <table class="cmp-table">
-      <thead><tr><th>기능</th><th>Vrew</th><th>CapCut</th><th class="hl">올인원 자동자막 생성기</th></tr></thead>
+      <thead><tr><th data-i18n="cmp.feature">기능</th><th>Vrew</th><th>CapCut</th><th class="hl" data-i18n="cmp.ourname">올인원 자동자막 생성기</th></tr></thead>
       <tbody>
-        <tr><td>자동 자막 생성</td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck hl">✓</span></td></tr>
-        <tr><td>원문 스크립트 싱크</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck hl">✓</span></td></tr>
-        <tr><td>무음 제거 + 자막 싱크</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck hl">✓</span></td></tr>
-        <tr><td>완전 무료</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck hl">✓</span></td></tr>
+        <tr><td data-i18n="cmp.row1">자동 자막 생성</td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck hl">✓</span></td></tr>
+        <tr><td data-i18n="cmp.row2">원문 스크립트 싱크</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck hl">✓</span></td></tr>
+        <tr><td data-i18n="cmp.row3">무음 제거 + 자막 싱크</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck hl">✓</span></td></tr>
+        <tr><td data-i18n="cmp.row4">완전 무료</td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="ck hl">✓</span></td></tr>
       </tbody>
     </table>
   </div>
 </section>
 <section class="install" id="install">
-  <div class="sec-label">설치 방법 (음성 전사 기능)</div>
+  <div class="sec-label" data-i18n="install.title">설치 방법 (음성 전사 기능)</div>
   <div class="inst-steps">
-    <div class="inst-step"><span class="inst-n">01</span><div class="inst-content"><h3>Python 설치</h3><p>설치 시 반드시 <strong style="color:var(--gold)">"Add Python to PATH"</strong> 체크!</p><a href="https://www.python.org/downloads/" target="_blank" class="code-hint">→ python.org/downloads</a></div></div>
-    <div class="inst-step"><span class="inst-n">02</span><div class="inst-content"><h3>올인원 자동자막 생성기 다운로드</h3><p>아래 다운로드 버튼에서 운영체제에 맞는 파일을 받으세요.</p><a href="#download" class="code-hint">→ 다운로드 섹션으로 이동</a></div></div>
-    <div class="inst-step"><span class="inst-n">03</span><div class="inst-content"><h3>setup 파일 실행</h3><p>압축 해제 후 실행하면 ffmpeg, Whisper, Flask가 자동 설치됩니다.</p><span class="code-hint">Windows: setup.bat 더블클릭</span><br><span class="code-hint" style="margin-top:6px">Mac/Linux: bash setup.sh</span></div></div>
-    <div class="inst-step"><span class="inst-n">04</span><div class="inst-content"><h3>localhost:5000에서 전사 사용</h3><p>setup이 실행된 상태에서 접속하면 음성 전사 기능을 사용할 수 있어요.</p><a href="http://localhost:5000" target="_blank" class="code-hint">→ localhost:5000 열기</a></div></div>
+    <div class="inst-step"><span class="inst-n">01</span><div class="inst-content"><h3 data-i18n="install.step1.title">Python 설치</h3><p data-i18n="install.step1.desc">설치 시 반드시 <strong style="color:var(--gold)">"Add Python to PATH"</strong> 체크!</p><a href="https://www.python.org/downloads/" target="_blank" class="code-hint">→ python.org/downloads</a></div></div>
+    <div class="inst-step"><span class="inst-n">02</span><div class="inst-content"><h3 data-i18n="install.step2.title">올인원 자동자막 생성기 다운로드</h3><p data-i18n="install.step2.desc">아래 다운로드 버튼에서 운영체제에 맞는 파일을 받으세요.</p><a href="#download" class="code-hint" data-i18n="install.step2.link">→ 다운로드 섹션으로 이동</a></div></div>
+    <div class="inst-step"><span class="inst-n">03</span><div class="inst-content"><h3 data-i18n="install.step3.title">setup 파일 실행</h3><p data-i18n="install.step3.desc">압축 해제 후 실행하면 ffmpeg, Whisper, Flask가 자동 설치됩니다.</p><span class="code-hint" data-i18n="install.win.setup">Windows: setup.bat 더블클릭</span><br><span class="code-hint" style="margin-top:6px" data-i18n="install.mac.setup">Mac/Linux: bash setup.sh</span></div></div>
+    <div class="inst-step"><span class="inst-n">04</span><div class="inst-content"><h3 data-i18n="install.step4.title">매번 사용할 때마다</h3><p data-i18n="install.step4.desc">컴퓨터를 껐다 켜면 서버가 종료돼요.<br>다시 사용할 때는 <strong style="color:var(--gold)">start.bat</strong>을 실행하세요.<br>(setup.bat은 최초 1회만)</p><span class="code-hint" data-i18n="install.win.start">Windows: start.bat 더블클릭</span><br><span class="code-hint" style="margin-top:6px" data-i18n="install.mac.start">Mac/Linux: bash start.sh</span><br><a href="http://localhost:5000" target="_blank" class="code-hint" style="margin-top:6px" data-i18n="install.localhost">→ 실행 후 localhost:5000 접속</a></div></div>
+    <div class="inst-step"><span class="inst-n">05</span><div class="inst-content"><h3 data-i18n="install.step5.title">setup vs start 차이</h3><p data-i18n="install.step5.desc"><strong style="color:var(--gold)">setup</strong> — 최초 1회만. 패키지·ffmpeg 자동 설치.<br><strong style="color:var(--green)">start</strong> — 매번 사용 시. 설치 없이 서버만 즉시 시작.</p><span class="code-hint" style="border-color:rgba(200,169,110,.4)" data-i18n="install.first">처음 설치: setup.bat</span><br><span class="code-hint" style="margin-top:6px;border-color:rgba(71,197,160,.4);color:var(--green)" data-i18n="install.daily">매일 사용: start.bat</span></div></div>
   </div>
 </section>
 <section class="dl-section" id="download">
   <div class="dl-inner">
-    <h2>지금 시작하세요</h2>
-    <p>완전 무료 · 데이터 외부 전송 없음 · 오프라인 작동</p>
+    <h2 data-i18n="dl.title">지금 시작하세요</h2>
+    <p data-i18n="dl.sub">완전 무료 · 데이터 외부 전송 없음 · 오프라인 작동</p>
     <div class="dl-btns">
-      <a href="https://github.com/Manmon7/srt-subtitle-generator/releases/latest/download/Windows.zip" class="btn-lp btn-lp-gold">⬇ Windows 다운로드</a>
-      <a href="https://github.com/Manmon7/srt-subtitle-generator/releases/latest/download/Mac_linux.zip" class="btn-lp btn-lp-outline">⬇ Mac / Linux</a>
+      <a href="https://github.com/Manmon7/srt-subtitle-generator/releases/latest/download/Windows.zip" class="btn-lp btn-lp-gold"><span data-i18n="dl.win">⬇ Windows 다운로드</span></a>
+      <a href="https://github.com/Manmon7/srt-subtitle-generator/releases/latest/download/Mac_linux.zip" class="btn-lp btn-lp-outline"><span data-i18n="dl.mac">⬇ Mac / Linux</span></a>
     </div>
-    <p class="dl-note">Python 3.8 이상 필요 · Windows 10+ · macOS 11+</p>
+    <p class="dl-note" data-i18n="dl.note">Python 3.8 이상 필요 · Windows 10+ · macOS 11+</p>
   </div>
 </section>
-<div class="bmc-wrap"><a href="https://buymeacoffee.com/wavesrt" target="_blank">☕ 이 도구가 도움이 됐다면 커피 한 잔 사주세요</a></div>
+<div class="bmc-wrap"><a href="https://buymeacoffee.com/wavesrt" target="_blank"><span data-i18n="bmc">☕ 이 도구가 도움이 됐다면 커피 한 잔 사주세요</span></a></div>
+<div style="text-align:center;padding:16px 24px;background:rgba(200,169,110,.06);border-top:1px solid var(--line);font-size:13px;color:var(--gray)">
+  <span data-i18n="contact">오류나 버그 발생 시 연락해주세요 →</span>
+  <a href="mailto:kenukman@gmail.com" style="color:var(--gold);font-weight:600;margin-left:4px">kenukman@gmail.com</a>
+</div>
 <footer>
-  <span class="footer-brand">올인원 자동자막 생성기 © 2025</span>
+  <span class="footer-brand" data-i18n="footer.brand">올인원 자동자막 생성기 © 2025</span>
   <div class="footer-links">
-    <a href="https://github.com/Manmon7/srt-subtitle-generator" target="_blank">GitHub</a>
-    <a href="#install">설치 가이드</a>
-    <a href="#app">앱 사용</a>
+    <a href="https://github.com/Manmon7/srt-subtitle-generator" target="_blank" data-i18n="footer.github">GitHub</a>
+    <a href="#install" data-i18n="footer.install">설치 가이드</a>
+    <a href="#app" data-i18n="footer.app">앱 사용</a>
   </div>
 </footer>
 </div>
@@ -1455,6 +1547,509 @@ function downloadCleanAudio() {
   a.href=URL.createObjectURL(blob);a.download='clean_audio.wav';a.click();
   URL.revokeObjectURL(a.href);
 }
+
+// ══ 다국어 지원 ══
+const I18N = {
+  ko: {
+    // 헤더
+    'nav.app': '앱 사용',
+    'nav.install': '설치 안내',
+    'nav.download': '다운로드',
+    // 안내 메시지
+    'notice.text': '💡 <strong>음성 전사</strong>와 <strong>영상 무음제거</strong>는 로컬 설치 후 <a href="http://localhost:5000" target="_blank">localhost:5000</a>에서 사용하세요. 이 페이지에서는 <strong>싱크 합치기 · 스크립트→오리지널 자막 생성 · 무음 삭제</strong>를 설치 없이 바로 사용할 수 있어요. <a href="javascript:void(0)" onclick="document.getElementById(\'install\').scrollIntoView({behavior:\'smooth\'})">설치 안내 →</a>',
+    // 탭
+    'tab.txt2srt': '📝 스크립트 → 오리지널 자막',
+    'tab.retime': '🔧 싱크 합치기',
+    'tab.silence': '✂️ 무음 삭제',
+    // 스크립트→자막
+    'txt2srt.card1': '원문 텍스트 입력',
+    'txt2srt.placeholder': '원문 텍스트를 입력하세요. 엔터로 직접 줄을 나눌 수도 있어요.',
+    'txt2srt.maxchars': '최대 글자 수 (한글 기준, 자동 분절 시 적용)',
+    'txt2srt.duration': '영상 총 길이 (초, 타임스탬프 계산용)',
+    'txt2srt.outfmt': '출력 자막 형식',
+    'txt2srt.editcard': '자막 줄 편집 — 엔터로 분할 · + 추가 · × 삭제',
+    'txt2srt.addtop': '+ 맨 위',
+    'txt2srt.reset': '↩ 다시 입력',
+    'txt2srt.build': '📝 SRT 생성',
+    'txt2srt.btn': '📝 자동 분절 후 편집',
+    'txt2srt.count': '자막 수',
+    'txt2srt.dur': '총 길이',
+    'txt2srt.copy': '📋 복사',
+    'txt2srt.dl': '⬇ 자막 다운로드',
+    // 싱크 합치기
+    'retime.whisper.title': 'WHISPER 자막 (타이밍 O, 오타 X)',
+    'retime.whisper.label': 'WHISPER.SRT',
+    'retime.whisper.ph': 'Whisper SRT를 붙여넣거나 파일을 드래그 / 클릭해서 열어주세요',
+    'retime.original.title': '원문 자막 (텍스트 O, 타이밍 X)',
+    'retime.original.label': 'ORIGINAL.SRT',
+    'retime.original.ph': '원문 SRT를 붙여넣거나 파일을 드래그 / 클릭해서 열어주세요',
+    'retime.outfmt': '출력 형식',
+    'retime.btn': '🔧 타이밍 재배분하기',
+    'retime.w': 'Whisper',
+    'retime.o': '원문',
+    'retime.c': '결과',
+    'retime.copy': '📋 복사',
+    'retime.dl': '⬇ SRT 다운로드',
+    // 무음 삭제
+    'silence.upload.title': '오디오 파일 + 자막 파일을 함께 드래그하거나 클릭해서 선택',
+    'silence.upload.sub': '오디오: MP3, WAV, M4A 등 · 자막: .srt .vtt .ass .sbv (선택사항)',
+    'silence.settings.title': '무음 감지 설정',
+    'silence.threshold': '감지 임계값 (높을수록 더 많이 감지)',
+    'silence.mindur': '최소 무음 길이 (초)',
+    'silence.detect': '🔍 무음 구간 감지',
+    'silence.srt.title': '입력 자막',
+    'silence.preview.btn': '▶ 무음 제거 후 미리보기',
+    'silence.export.btn': '⬇ 제거된 오디오 + 자막 다운로드',
+    'silence.removed': '제거된 무음',
+    'silence.adj': '자막 조정',
+    'silence.video.notice': '📹 <strong>영상 무음삭제</strong>는 로컬에서 진행해주세요. <a href="http://localhost:5000" target="_blank">localhost:5000 →</a>',
+    // 워크플로우
+    'workflow.title': '쇼츠 / 영상 제작 워크플로우',
+    'workflow.subtitle': '미디어 종류에 따라 다른 경로를 선택하세요',
+    'workflow.badge.local.desc': '= 개인 PC (localhost:5000)',
+    'workflow.badge.web.desc': '= 이 페이지',
+    'workflow.tab.audio': '오디오 + 자막',
+    'workflow.tab.video': '영상 + 자막',
+    'workflow.step1.title': '음성 추출 및<br>자막 생성',
+    'workflow.step1.desc': '개인 PC에서 Whisper AI로 음성을 자막파일로 변환합니다.',
+    'workflow.step2.title': '대본 최적화 및<br>싱크 결합',
+    'workflow.step2.desc': '오리지널 자막을 생성하고 Whisper 자막과 매칭해 정확한 싱크를 완성합니다.',
+    'workflow.step3.title': '무음 구간<br>자동 컷편집',
+    'workflow.step3.desc': '완성된 자막 기준으로 무음 구간을 감지하고 한 번에 삭제합니다.',
+    'workflow.step2.btn': '싱크 합치기 →',
+    'workflow.step3.btn': '무음 삭제 →',
+    'workflow.v.step1.title': '음성 추출 및<br>자막 생성',
+    'workflow.v.step1.desc': 'Whisper AI로 영상에서 음성을 추출해 자막을 생성합니다.',
+    'workflow.v.step2.title': '대본 최적화 및<br>싱크 결합',
+    'workflow.v.step2.desc': '오리지널 자막을 생성하고 Whisper 자막과 매칭해 싱크를 완성합니다.',
+    'workflow.v.step3.title': '영상 무음 삭제<br><span style="font-size:11px;font-weight:400;color:var(--gray)">(로컬로 복귀)</span>',
+    'workflow.v.step3.desc': '영상 파일은 로컬에서 처리합니다. 완성된 싱크 자막을 넣으면 타임스탬프도 자동 조정됩니다.',
+    'workflow.v.step3.btn': '영상 무음 삭제 →',
+    'workflow.v.step4.title': '자막 미세 조정<br><span style="font-size:11px;font-weight:400;color:var(--gray)">(선택)</span>',
+    'workflow.v.step4.desc': '조정된 자막을 웹에서 추가 편집하거나 형식 변환할 수 있습니다.',
+    'workflow.v.step4.btn': '스크립트 편집 →',
+    // 랜딩
+    'hero.eyebrow': 'Free · Local AI · No API Key · Multi-Format',
+    'hero.title': '올인원<span>자동자막 생성기</span>',
+    'hero.sub': 'Whisper AI가 음성을 전사하고, 원문 스크립트와 타이밍을 자동으로 싱크합니다.',
+    'hero.use': '⬆ 앱 바로 사용',
+    'hero.dl': '⬇ 다운로드',
+    'feat.title': '핵심 기능',
+    'feat1.title': 'Whisper AI 자동 전사', 'feat1.desc': '로컬 Whisper AI로 음성을 전사하고 자연스럽게 분절합니다.',
+    'feat2.title': '스크립트 → 오리지널 자막', 'feat2.desc': '스크립트를 자막 형식으로 자동 분절. 글자 수 기준 타임스탬프 자동 부여.',
+    'feat3.title': '원문 스크립트 싱크', 'feat3.desc': 'Whisper 타이밍 + 오리지널 자막을 자동 매핑. 오타 없는 정확한 자막.',
+    'feat4.title': '무음 구간 제거', 'feat4.desc': '호흡, 무음 감지 후 제거. 오디오/영상과 자막이 함께 조정됩니다.',
+    'feat5.title': '다양한 자막 형식', 'feat5.desc': 'SRT, VTT, ASS, SBV 등 모든 편집 프로그램 호환 형식 지원.',
+    'feat6.title': '완전 무료', 'feat6.desc': '구독 없음. 데이터 외부 전송 없음. API 키 불필요.',
+    'compare.title': '왜 <em>올인원 자동자막 생성기</em>인가요?',
+    'install.title': '설치 방법 (음성 전사 기능)',
+    'install.step1.title': 'Python 설치', 'install.step1.desc': '설치 시 반드시 <strong style="color:var(--gold)">"Add Python to PATH"</strong> 체크!',
+    'install.step2.title': '올인원 자동자막 생성기 다운로드', 'install.step2.desc': '아래 다운로드 버튼에서 운영체제에 맞는 파일을 받으세요.',
+    'install.step2.link': '→ 다운로드 섹션으로 이동',
+    'install.win.setup': 'Windows: setup.bat 더블클릭',
+    'install.mac.setup': 'Mac/Linux: bash setup.sh',
+    'install.win.start': 'Windows: start.bat 더블클릭',
+    'install.mac.start': 'Mac/Linux: bash start.sh',
+    'install.localhost': '→ 실행 후 localhost:5000 접속',
+    'install.first': '처음 설치: setup.bat',
+    'install.daily': '매일 사용: start.bat',
+    'txt2srt.card1': '원문 텍스트 입력',
+    'txt2srt.placeholder': '원문 텍스트를 입력하세요. 엔터로 직접 줄을 나눌 수도 있어요.',
+    'txt2srt.maxchars': '최대 글자 수 (한글 기준)',
+    'txt2srt.duration': '영상 총 길이 (초, 타임스탬프 계산용)',
+    'txt2srt.duration.ph': '예: 63',
+    'retime.whisper.title': 'Whisper SRT (타이밍 O, 오타 X)',
+    'retime.whisper.label': 'WHISPER 자막',
+    'retime.whisper.ph': 'Whisper SRT를 붙여넣거나 파일을 드래그 / 클릭해서 열어주세요',
+    'retime.original.title': '원문 SRT (텍스트 O, 타이밍 X)',
+    'retime.original.label': '원문 자막',
+    'retime.original.ph': '원문 SRT를 붙여넣거나 파일을 드래그 / 클릭해서 열어주세요',
+    'retime.outfmt': '출력 형식:',
+    'silence.upload.title': '오디오 + SRT 동시 첨부 (드래그 가능)',
+    'silence.upload.dztitle': '오디오 파일 + 자막 파일을 함께 드래그하거나 클릭해서 선택',
+    'silence.upload.sub': '오디오: MP3, WAV, M4A 등 · 자막: .srt .vtt .ass .sbv (선택사항)',
+    'silence.settings.title': '무음 감지 설정',
+    'silence.threshold': '감지 임계값 (높을수록 더 많이 감지)',
+    'silence.mindur': '최소 무음 길이 (초)',
+    'silence.outfmt': '출력 자막 형식:',
+    'silence.play': '▶ 재생',
+    'silence.preview.orig': '원본 오디오 미리보기 (빨간 구간 = 무음)',
+    'silence.preview.clean': '✅ 무음 제거된 오디오 미리보기',
+    'silence.legend.red': '■ <span style="color:rgba(232,71,71,.6)">빨간 구간</span> = 무음',
+    'silence.legend.blue': '■ <span style="color:var(--blue)">파란 선</span> = 현재 위치',
+    'silence.video.notice': '📹 <strong style="color:var(--blue)">영상 무음삭제</strong>는 로컬에서 진행해주세요. <a href="http://localhost:5000" target="_blank" style="color:var(--blue);margin-left:4px">localhost:5000 →</a>',
+    'install.step3.title': 'setup 파일 실행', 'install.step3.desc': '압축 해제 후 실행하면 ffmpeg, Whisper, Flask가 자동 설치됩니다.',
+    'install.step4.title': '매번 사용할 때마다', 'install.step4.desc': '컴퓨터를 껐다 켜면 서버가 종료돼요.<br>다시 사용할 때는 <strong style="color:var(--gold)">start.bat</strong>을 실행하세요.<br>(setup.bat은 최초 1회만)',
+    'install.step5.title': 'setup vs start 차이', 'install.step5.desc': '<strong style="color:var(--gold)">setup</strong> — 최초 1회만. 패키지·ffmpeg 자동 설치.<br><strong style="color:var(--green)">start</strong> — 매번 사용 시. 설치 없이 서버만 즉시 시작.',
+    'dl.title': '지금 시작하세요',
+    'dl.sub': '완전 무료 · 데이터 외부 전송 없음 · 오프라인 작동',
+    'dl.win': '⬇ Windows 다운로드',
+    'dl.mac': '⬇ Mac / Linux',
+    'dl.note': 'Python 3.8 이상 필요 · Windows 10+ · macOS 11+',
+    'bmc': '☕ 이 도구가 도움이 됐다면 커피 한 잔 사주세요',
+    'bmc.header': '이 도구가 도움이 됐다면 커피 한 잔 사주세요',
+    'contact': '오류나 버그 발생 시 연락해주세요 →',
+    'footer.brand': '올인원 자동자막 생성기 © 2025',
+    'footer.github': 'GitHub',
+    'footer.install': '설치 가이드',
+    'footer.app': '앱 사용',
+    'file.open': '📂 파일 열기',
+    'copy.done': '✅ 복사됨!',
+    'cmp.feature': '기능',
+    'cmp.ourname': '올인원 자동자막 생성기',
+    'cmp.row1': '자동 자막 생성',
+    'cmp.row2': '원문 스크립트 싱크',
+    'cmp.row3': '무음 제거 + 자막 싱크',
+    'cmp.row4': '완전 무료',
+    'fmt.srt': '.srt (일반)',
+    'fmt.vtt': '.vtt (WebVTT / YouTube)',
+    'fmt.ass': '.ass (고급 스타일)',
+    'fmt.sbv': '.sbv (YouTube)',
+    'fmt.txt': '.txt (텍스트만)',
+  },
+  en: {
+    'nav.app': 'Use App',
+    'nav.install': 'Install Guide',
+    'nav.download': 'Download',
+    'notice.text': '💡 <strong>Voice transcription</strong> and <strong>video silence removal</strong> require local installation at <a href="http://localhost:5000" target="_blank">localhost:5000</a>. <strong>Sync merge · Script→Subtitle · Silence removal</strong> are available here without installation. <a href="javascript:void(0)" onclick="document.getElementById(\'install\').scrollIntoView({behavior:\'smooth\'})">Install Guide →</a>',
+    'tab.txt2srt': '📝 Script → Original Subtitle',
+    'tab.retime': '🔧 Sync Merge',
+    'tab.silence': '✂️ Silence Remove',
+    'txt2srt.card1': 'Enter Script Text',
+    'txt2srt.placeholder': 'Enter your script. You can also split lines with Enter.',
+    'txt2srt.maxchars': 'Max characters per line (for auto-split)',
+    'txt2srt.duration': 'Total video length (sec, for timestamps)',
+    'txt2srt.outfmt': 'Output subtitle format',
+    'txt2srt.editcard': 'Edit lines — Enter to split · + add · × delete',
+    'txt2srt.addtop': '+ Top',
+    'txt2srt.reset': '↩ Re-enter',
+    'txt2srt.build': '📝 Generate Subtitle',
+    'txt2srt.btn': '📝 Auto-split & Edit',
+    'txt2srt.count': 'Count',
+    'txt2srt.dur': 'Duration',
+    'txt2srt.copy': '📋 Copy',
+    'txt2srt.dl': '⬇ Download Subtitle',
+    'retime.whisper.title': 'WHISPER SUBTITLE (Timing ✓, Typos ✗)',
+    'retime.whisper.label': 'WHISPER.SRT',
+    'retime.whisper.ph': 'Paste Whisper SRT or drag/click to open',
+    'retime.original.title': 'ORIGINAL SUBTITLE (Text ✓, Timing ✗)',
+    'retime.original.label': 'ORIGINAL.SRT',
+    'retime.original.ph': 'Paste original SRT or drag/click to open',
+    'retime.outfmt': 'Output format',
+    'retime.btn': '🔧 Redistribute Timing',
+    'retime.w': 'Whisper',
+    'retime.o': 'Original',
+    'retime.c': 'Result',
+    'retime.copy': '📋 Copy',
+    'retime.dl': '⬇ Download SRT',
+    'silence.upload.title': 'Drag or click to upload Audio + Subtitle files',
+    'silence.upload.sub': 'Audio: MP3, WAV, M4A · Subtitle: .srt .vtt .ass .sbv (optional)',
+    'silence.settings.title': 'Silence Detection Settings',
+    'silence.threshold': 'Detection threshold (higher = more detected)',
+    'silence.mindur': 'Minimum silence duration (sec)',
+    'silence.detect': '🔍 Detect Silence',
+    'silence.srt.title': 'Input Subtitle',
+    'silence.preview.btn': '▶ Preview After Silence Removal',
+    'silence.export.btn': '⬇ Download Audio + Subtitle',
+    'silence.removed': 'Removed',
+    'silence.adj': 'Subtitle adjusted',
+    'silence.video.notice': '📹 <strong>Video silence removal</strong> is available locally. <a href="http://localhost:5000" target="_blank">localhost:5000 →</a>',
+    'workflow.title': 'Shorts / Video Production Workflow',
+    'workflow.subtitle': 'Choose a path based on your media type',
+    'workflow.badge.local.desc': '= Your PC (localhost:5000)',
+    'workflow.badge.web.desc': '= This page',
+    'workflow.tab.audio': 'Audio + Subtitle',
+    'workflow.tab.video': 'Video + Subtitle',
+    'workflow.step1.title': 'Extract Audio &<br>Generate Subtitle',
+    'workflow.step1.desc': 'Transcribe audio securely on your PC using Whisper AI.',
+    'workflow.step2.title': 'Optimize Script &<br>Sync Merge',
+    'workflow.step2.desc': 'Generate original subtitles and match them with Whisper timing for precise sync.',
+    'workflow.step3.title': 'Auto Cut<br>Silent Sections',
+    'workflow.step3.desc': 'Detect and remove silent gaps based on the synced subtitle.',
+    'workflow.step2.btn': 'Sync Merge →',
+    'workflow.step3.btn': 'Silence Remove →',
+    'workflow.v.step1.title': 'Extract Audio &<br>Generate Subtitle',
+    'workflow.v.step1.desc': 'Transcribe audio from your video using Whisper AI on your local PC.',
+    'workflow.v.step2.title': 'Optimize Script &<br>Sync Merge',
+    'workflow.v.step2.desc': 'Generate original subtitles and match them with Whisper timing.',
+    'workflow.v.step3.title': 'Video Silence Remove<br><span style="font-size:11px;font-weight:400;color:var(--gray)">(Back to Local)</span>',
+    'workflow.v.step3.desc': 'Video files must be processed locally. Add your synced subtitle to auto-adjust timestamps too.',
+    'workflow.v.step3.btn': 'Video Silence Remove →',
+    'workflow.v.step4.title': 'Fine-tune Subtitle<br><span style="font-size:11px;font-weight:400;color:var(--gray)">(Optional)</span>',
+    'workflow.v.step4.desc': 'Further edit or convert the adjusted subtitle here on the web.',
+    'workflow.v.step4.btn': 'Script Editor →',
+    'hero.eyebrow': 'Free · Local AI · No API Key · Multi-Format',
+    'hero.title': 'All-in-One<span>Auto Subtitle Generator</span>',
+    'hero.sub': 'Whisper AI transcribes audio and automatically syncs with your original script.',
+    'hero.use': '⬆ Use App Now',
+    'hero.dl': '⬇ Download',
+    'feat.title': 'Key Features',
+    'feat1.title': 'Whisper AI Transcription', 'feat1.desc': 'Transcribe audio locally with Whisper AI. No API key needed.',
+    'feat2.title': 'Script → Original Subtitle', 'feat2.desc': 'Auto-split scripts into subtitle format with timestamp calculation.',
+    'feat3.title': 'Script Sync Merge', 'feat3.desc': 'Auto-map Whisper timing + original subtitles. Accurate, typo-free.',
+    'feat4.title': 'Silence Removal', 'feat4.desc': 'Detect and remove silence. Audio/video and subtitles adjusted together.',
+    'feat5.title': 'Multi-Format Subtitles', 'feat5.desc': 'SRT, VTT, ASS, SBV and more. Compatible with all editors.',
+    'feat6.title': 'Completely Free', 'feat6.desc': 'No subscription. No data sent externally. No API key required.',
+    'compare.title': 'Why <em>All-in-One Auto Subtitle Generator</em>?',
+    'install.title': 'Installation Guide (Voice Transcription)',
+    'install.step1.title': 'Install Python', 'install.step1.desc': 'Check <strong style="color:var(--gold)">"Add Python to PATH"</strong> during installation!',
+    'install.step2.title': 'Download App', 'install.step2.desc': 'Download the file for your OS from the download button below.',
+    'install.step2.link': '→ Go to Download section',
+    'install.win.setup': 'Windows: double-click setup.bat',
+    'install.mac.setup': 'Mac/Linux: bash setup.sh',
+    'install.win.start': 'Windows: double-click start.bat',
+    'install.mac.start': 'Mac/Linux: bash start.sh',
+    'install.localhost': '→ Open localhost:5000 after running',
+    'install.first': 'First install: setup.bat',
+    'install.daily': 'Daily use: start.bat',
+    'txt2srt.card1': 'Enter Script Text',
+    'txt2srt.placeholder': 'Enter your script. You can also split lines with Enter.',
+    'txt2srt.maxchars': 'Max characters per line (for auto-split)',
+    'txt2srt.duration': 'Total video length (sec, for timestamps)',
+    'txt2srt.duration.ph': 'e.g. 63',
+    'retime.whisper.title': 'Whisper SRT (Timing ✓, Typos ✗)',
+    'retime.whisper.label': 'WHISPER SRT',
+    'retime.whisper.ph': 'Paste Whisper SRT or drag / click to open',
+    'retime.original.title': 'Original SRT (Text ✓, Timing ✗)',
+    'retime.original.label': 'ORIGINAL SRT',
+    'retime.original.ph': 'Paste Original SRT or drag / click to open',
+    'retime.outfmt': 'Output format:',
+    'silence.upload.title': 'Upload Audio + SRT together (drag supported)',
+    'silence.upload.dztitle': 'Drag audio + subtitle files here or click to select',
+    'silence.upload.sub': 'Audio: MP3, WAV, M4A etc · Subtitle: .srt .vtt .ass .sbv (optional)',
+    'silence.settings.title': 'Silence Detection Settings',
+    'silence.threshold': 'Detection threshold (higher = more detected)',
+    'silence.mindur': 'Minimum silence duration (sec)',
+    'silence.outfmt': 'Output subtitle format:',
+    'silence.play': '▶ Play',
+    'silence.preview.orig': 'Original Audio Preview (red zones = silence)',
+    'silence.preview.clean': '✅ Silence-Removed Audio Preview',
+    'silence.legend.red': '■ <span style="color:rgba(232,71,71,.6)">Red zones</span> = silence',
+    'silence.legend.blue': '■ <span style="color:var(--blue)">Blue line</span> = current position',
+    'silence.video.notice': '📹 <strong style="color:var(--blue)">Video silence removal</strong> requires local app. <a href="http://localhost:5000" target="_blank" style="color:var(--blue);margin-left:4px">localhost:5000 →</a>',
+    'install.step3.title': 'Run setup file', 'install.step3.desc': 'Unzip and run — ffmpeg, Whisper, Flask are auto-installed.',
+    'install.step4.title': 'Every time you use it', 'install.step4.desc': 'Server stops when you shut down your PC.<br>Run <strong style="color:var(--gold)">start.bat</strong> each time.<br>(setup.bat is only for first-time setup)',
+    'install.step5.title': 'setup vs start', 'install.step5.desc': '<strong style="color:var(--gold)">setup</strong> — First time only. Auto-installs packages & ffmpeg.<br><strong style="color:var(--green)">start</strong> — Every use. Starts server instantly.',
+    'dl.title': 'Get Started Now',
+    'dl.sub': 'Completely Free · No Data Sent · Works Offline',
+    'dl.win': '⬇ Windows Download',
+    'dl.mac': '⬇ Mac / Linux',
+    'dl.note': 'Requires Python 3.8+ · Windows 10+ · macOS 11+',
+    'bmc': '☕ If this tool helped you, buy me a coffee',
+    'bmc.header': 'If this tool helped you, buy me a coffee',
+    'contact': 'Report bugs or errors →',
+    'footer.brand': 'All-in-One Auto Subtitle Generator © 2025',
+    'footer.github': 'GitHub',
+    'footer.install': 'Install Guide',
+    'footer.app': 'Use App',
+    'file.open': '📂 Open File',
+    'copy.done': '✅ Copied!',
+    'cmp.feature': 'Feature',
+    'cmp.ourname': 'All-in-One Auto Subtitle Generator',
+    'cmp.row1': 'Auto Subtitle Generation',
+    'cmp.row2': 'Script Sync Merge',
+    'cmp.row3': 'Silence Removal + Subtitle Sync',
+    'cmp.row4': 'Completely Free',
+    'fmt.srt': '.srt (standard)',
+    'fmt.vtt': '.vtt (WebVTT / YouTube)',
+    'fmt.ass': '.ass (advanced style)',
+    'fmt.sbv': '.sbv (YouTube)',
+    'fmt.txt': '.txt (text only)',
+  },
+  ja: {
+    'nav.app': 'アプリ使用',
+    'nav.install': 'インストール',
+    'nav.download': 'ダウンロード',
+    'notice.text': '💡 <strong>音声文字起こし</strong>と<strong>動画無音除去</strong>はローカルインストール後、<a href="http://localhost:5000" target="_blank">localhost:5000</a>でご利用ください。このページでは<strong>シンク結合・スクリプト→字幕生成・無音削除</strong>をインストールなしで利用できます。<a href="javascript:void(0)" onclick="document.getElementById(\'install\').scrollIntoView({behavior:\'smooth\'})">インストールガイド →</a>',
+    'tab.txt2srt': '📝 スクリプト → 字幕生成',
+    'tab.retime': '🔧 シンク結合',
+    'tab.silence': '✂️ 無音削除',
+    'txt2srt.card1': '原文テキスト入力',
+    'txt2srt.placeholder': '原文テキストを入力してください。Enterキーで行を分割できます。',
+    'txt2srt.maxchars': '最大文字数（自動分割時に適用）',
+    'txt2srt.duration': '動画の総時間（秒、タイムスタンプ計算用）',
+    'txt2srt.outfmt': '出力字幕形式',
+    'txt2srt.editcard': '字幕行編集 — Enterで分割 · +追加 · ×削除',
+    'txt2srt.addtop': '+ 先頭追加',
+    'txt2srt.reset': '↩ 再入力',
+    'txt2srt.build': '📝 字幕生成',
+    'txt2srt.btn': '📝 自動分割して編集',
+    'txt2srt.count': '字幕数',
+    'txt2srt.dur': '合計時間',
+    'txt2srt.copy': '📋 コピー',
+    'txt2srt.dl': '⬇ 字幕ダウンロード',
+    'retime.whisper.title': 'WHISPER字幕（タイミング○、誤字×）',
+    'retime.whisper.label': 'WHISPER.SRT',
+    'retime.whisper.ph': 'Whisper SRTを貼り付けるか、ファイルをドラッグして開いてください',
+    'retime.original.title': '原文字幕（テキスト○、タイミング×）',
+    'retime.original.label': 'ORIGINAL.SRT',
+    'retime.original.ph': '原文SRTを貼り付けるか、ファイルをドラッグして開いてください',
+    'retime.outfmt': '出力形式',
+    'retime.btn': '🔧 タイミング再配分',
+    'retime.w': 'Whisper',
+    'retime.o': '原文',
+    'retime.c': '結果',
+    'retime.copy': '📋 コピー',
+    'retime.dl': '⬇ SRTダウンロード',
+    'silence.upload.title': 'オーディオ＋字幕ファイルをドラッグまたはクリックして選択',
+    'silence.upload.sub': 'オーディオ: MP3, WAV, M4A · 字幕: .srt .vtt .ass .sbv（任意）',
+    'silence.settings.title': '無音検出設定',
+    'silence.threshold': '検出しきい値（高いほど多く検出）',
+    'silence.mindur': '最小無音時間（秒）',
+    'silence.detect': '🔍 無音区間を検出',
+    'silence.srt.title': '入力字幕',
+    'silence.preview.btn': '▶ 無音除去後プレビュー',
+    'silence.export.btn': '⬇ オーディオ＋字幕ダウンロード',
+    'silence.removed': '除去された無音',
+    'silence.adj': '字幕調整',
+    'silence.video.notice': '📹 <strong>動画の無音削除</strong>はローカルで行ってください。<a href="http://localhost:5000" target="_blank">localhost:5000 →</a>',
+    'workflow.title': 'ショート動画制作ワークフロー',
+    'workflow.subtitle': 'メディアの種類に合わせてパスを選択してください',
+    'workflow.badge.local.desc': '= PC（localhost:5000）',
+    'workflow.badge.web.desc': '= このページ',
+    'workflow.tab.audio': '音声 + 字幕',
+    'workflow.tab.video': '動画 + 字幕',
+    'workflow.step1.title': '音声抽出と<br>字幕生成',
+    'workflow.step1.desc': 'PC上でWhisper AIを使い、音声を字幕ファイルに変換します。',
+    'workflow.step2.title': '原稿最適化と<br>シンク結合',
+    'workflow.step2.desc': '原文字幕を生成し、Whisper字幕と自動マッチングして正確なシンクを完成させます。',
+    'workflow.step3.title': '無音区間の<br>自動カット編集',
+    'workflow.step3.desc': '完成した字幕を基準に無音区間を検出し、一括で削除します。',
+    'workflow.step2.btn': 'シンク結合 →',
+    'workflow.step3.btn': '無音削除 →',
+    'workflow.v.step1.title': '音声抽出と<br>字幕生成',
+    'workflow.v.step1.desc': 'Whisper AIで動画から音声を抽出し字幕を生成します。',
+    'workflow.v.step2.title': '原稿最適化と<br>シンク結合',
+    'workflow.v.step2.desc': '原文字幕を生成し、Whisper字幕とマッチングしてシンクを完成させます。',
+    'workflow.v.step3.title': '動画無音削除<br><span style="font-size:11px;font-weight:400;color:var(--gray)">（ローカルに戻る）</span>',
+    'workflow.v.step3.desc': '動画ファイルはローカルで処理します。シンク済み字幕を入れるとタイムスタンプも自動調整されます。',
+    'workflow.v.step3.btn': '動画無音削除 →',
+    'workflow.v.step4.title': '字幕微調整<br><span style="font-size:11px;font-weight:400;color:var(--gray)">（任意）</span>',
+    'workflow.v.step4.desc': '調整済み字幕をWebでさらに編集したり形式変換できます。',
+    'workflow.v.step4.btn': 'スクリプト編集 →',
+    'hero.eyebrow': '無料 · ローカルAI · APIキー不要 · マルチフォーマット',
+    'hero.title': 'オールインワン<span>自動字幕生成ツール</span>',
+    'hero.sub': 'Whisper AIが音声を文字起こしし、原稿と自動的にシンクします。',
+    'hero.use': '⬆ アプリを使う',
+    'hero.dl': '⬇ ダウンロード',
+    'feat.title': '主な機能',
+    'feat1.title': 'Whisper AI 自動文字起こし', 'feat1.desc': 'ローカルWhisper AIで音声を文字起こし。APIキー不要。',
+    'feat2.title': 'スクリプト → 字幕生成', 'feat2.desc': 'スクリプトを字幕形式に自動分割。文字数基準でタイムスタンプを自動付与。',
+    'feat3.title': 'スクリプトシンク結合', 'feat3.desc': 'Whisperタイミング＋原文字幕を自動マッピング。正確で誤字のない字幕。',
+    'feat4.title': '無音区間除去', 'feat4.desc': '息継ぎ・無音を検出して除去。オーディオと字幕が同時に調整されます。',
+    'feat5.title': '多様な字幕形式', 'feat5.desc': 'SRT、VTT、ASS、SBVなど全編集ソフト対応形式をサポート。',
+    'feat6.title': '完全無料', 'feat6.desc': 'サブスクなし。データ外部送信なし。APIキー不要。',
+    'compare.title': 'なぜ<em>オールインワン自動字幕生成ツール</em>なのか？',
+    'install.title': 'インストール方法（音声文字起こし機能）',
+    'install.step1.title': 'Pythonをインストール', 'install.step1.desc': 'インストール時に<strong style="color:var(--gold)">"Add Python to PATH"</strong>を必ずチェック！',
+    'install.step2.title': 'アプリをダウンロード', 'install.step2.desc': '下のダウンロードボタンからOSに合ったファイルを取得してください。',
+    'install.step2.link': '→ ダウンロードセクションへ',
+    'install.step3.title': 'setupファイルを実行', 'install.step3.desc': '解凍後に実行するとffmpeg、Whisper、Flaskが自動インストールされます。',
+    'install.step4.title': '毎回使用する前に', 'install.step4.desc': 'PCをシャットダウンするとサーバーが停止します。<br>再度使用する際は<strong style="color:var(--gold)">start.bat</strong>を実行してください。<br>（setup.batは初回のみ）',
+    'install.step5.title': 'setupとstartの違い', 'install.step5.desc': '<strong style="color:var(--gold)">setup</strong> — 初回のみ。パッケージ＆ffmpegを自動インストール。<br><strong style="color:var(--green)">start</strong> — 毎回使用時。インストールなしで即サーバー起動。',
+    'dl.title': '今すぐ始めましょう',
+    'dl.sub': '完全無料 · データ外部送信なし · オフライン動作',
+    'dl.win': '⬇ Windowsダウンロード',
+    'dl.mac': '⬇ Mac / Linux',
+    'dl.note': 'Python 3.8以上が必要 · Windows 10+ · macOS 11+',
+    'bmc': '☕ このツールが役に立ったら、コーヒー一杯おごってください',
+    'bmc.header': 'このツールが役に立ったら、コーヒーをおごってください',
+    'contact': 'バグや不具合はこちらへ →',
+    'footer.brand': 'オールインワン自動字幕生成ツール © 2025',
+    'footer.github': 'GitHub',
+    'footer.install': 'インストールガイド',
+    'footer.app': 'アプリ使用',
+    'file.open': '📂 ファイルを開く',
+    'copy.done': '✅ コピー完了！',
+    'cmp.feature': '機能',
+    'cmp.ourname': 'オールインワン自動字幕生成ツール',
+    'cmp.row1': '自動字幕生成',
+    'cmp.row2': 'スクリプトシンク結合',
+    'cmp.row3': '無音除去＋字幕シンク',
+    'cmp.row4': '完全無料',
+    'fmt.srt': '.srt（標準）',
+    'fmt.vtt': '.vtt（WebVTT / YouTube）',
+    'fmt.ass': '.ass（高度なスタイル）',
+    'fmt.sbv': '.sbv（YouTube）',
+    'fmt.txt': '.txt（テキストのみ）',
+    'install.win.setup': 'Windows: setup.bat をダブルクリック',
+    'install.mac.setup': 'Mac/Linux: bash setup.sh',
+    'install.win.start': 'Windows: start.bat をダブルクリック',
+    'install.mac.start': 'Mac/Linux: bash start.sh',
+    'install.localhost': '→ 起動後 localhost:5000 にアクセス',
+    'install.first': '初回インストール: setup.bat',
+    'install.daily': '毎回使用: start.bat',
+    'txt2srt.card1': '原文テキスト入力',
+    'txt2srt.placeholder': '原文テキストを入力してください。Enterキーで行を分割できます。',
+    'txt2srt.maxchars': '最大文字数（自動分割時に適用）',
+    'txt2srt.duration': '動画の総時間（秒、タイムスタンプ計算用）',
+    'txt2srt.duration.ph': '例: 63',
+    'retime.whisper.title': 'Whisper字幕（タイミング○、誤字×）',
+    'retime.whisper.label': 'WHISPER字幕',
+    'retime.whisper.ph': 'Whisper SRTを貼り付けるか、ファイルをドラッグして開いてください',
+    'retime.original.title': '原文字幕（テキスト○、タイミング×）',
+    'retime.original.label': '原文字幕',
+    'retime.original.ph': '原文SRTを貼り付けるか、ファイルをドラッグして開いてください',
+    'retime.outfmt': '出力形式:',
+    'silence.upload.title': 'オーディオ＋字幕ファイルを同時添付（ドラッグ可）',
+    'silence.upload.dztitle': 'オーディオと字幕ファイルをまとめてドラッグ、またはクリックして選択',
+    'silence.upload.sub': 'オーディオ: MP3, WAV, M4A等 · 字幕: .srt .vtt .ass .sbv（任意）',
+    'silence.settings.title': '無音検出設定',
+    'silence.threshold': '検出しきい値（高いほど多く検出）',
+    'silence.mindur': '最小無音時間（秒）',
+    'silence.outfmt': '出力字幕形式:',
+    'silence.play': '▶ 再生',
+    'silence.preview.orig': '元音声プレビュー（赤区間 = 無音）',
+    'silence.preview.clean': '✅ 無音除去済み音声プレビュー',
+    'silence.legend.red': '■ <span style="color:rgba(232,71,71,.6)">赤区間</span> = 無音',
+    'silence.legend.blue': '■ <span style="color:var(--blue)">青線</span> = 現在位置',
+    'silence.video.notice': '📹 <strong style="color:var(--blue)">動画の無音削除</strong>はローカルアプリで行ってください。<a href="http://localhost:5000" target="_blank" style="color:var(--blue);margin-left:4px">localhost:5000 →</a>',
+  }
+};
+
+let currentLang = localStorage.getItem('wavesrt-lang') || 'ko';
+
+function t(key) {
+  return I18N[currentLang]?.[key] || I18N['ko']?.[key] || key;
+}
+
+function applyLang(lang) {
+  currentLang = lang;
+  localStorage.setItem('wavesrt-lang', lang);
+
+  // 언어 버튼 활성화
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+
+  // data-i18n 요소 교체
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    const val = t(key);
+    if (el.tagName === 'INPUT' && el.type !== 'button') {
+      el.placeholder = val;
+    } else if (el.tagName === 'TEXTAREA') {
+      el.placeholder = val;
+    } else {
+      el.innerHTML = val;
+    }
+  });
+
+  // data-i18n-placeholder
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+    el.placeholder = t(el.dataset.i18nPh);
+  });
+
+  // option 번역
+  document.querySelectorAll('[data-i18n-opt]').forEach(el => {
+    const val = t(el.dataset.i18nOpt);
+    if (val && val !== el.dataset.i18nOpt) el.textContent = val;
+  });
+}
+
+// 페이지 로드 시 적용
+document.addEventListener('DOMContentLoaded', () => applyLang(currentLang));
+
 </script>
 </body>
 </html>
