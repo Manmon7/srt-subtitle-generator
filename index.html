@@ -871,7 +871,7 @@ function splitTextLocal(text, maxChars) {
   const SENTENCE_END = new Set('.。!！?？'.split(''));
   const COMMA_END    = new Set(',，'.split(''));
   const BREAKS = new Set('다요죠까나군지네고며면야라니워어아'.split(''));
-  const PUNCTS = new Set(',.?!~…，。？！'.split(''));
+  const MIN_LEN = maxChars * 0.4; // 이것보다 짧으면 앞에서 끌어옴
 
   // 1) 접속사 앞 줄바꿈
   let processed = text;
@@ -894,14 +894,29 @@ function splitTextLocal(text, maxChars) {
       if (bufLen + tl > maxChars && buf.length) flush();
       buf.push(tok); bufLen += tl;
       const last = tok.trim().slice(-1);
-      // 문장부호 뒤 — 짧더라도 무조건 flush (다음 문장 끌어오지 않음)
       if (SENTENCE_END.has(last) || COMMA_END.has(last)) { flush(); continue; }
       if (bufLen >= maxChars * 0.6 && BREAKS.has(last)) { flush(); continue; }
       if (bufLen >= maxChars) flush();
     }
     flush();
   }
-  return segs;
+
+  // 3) 후처리: 너무 짧은 세그먼트는 앞 세그먼트의 마지막 어절을 끌어옴
+  //    단, 앞 세그먼트가 문장부호로 끝난 경우 경계 침범 안 함
+  for (let i = 1; i < segs.length; i++) {
+    if (koreanLen(segs[i]) < MIN_LEN) {
+      const prevLast = segs[i-1].trim().slice(-1);
+      // 앞 세그먼트가 문장부호로 끝나면 끌어오지 않음
+      if (SENTENCE_END.has(prevLast) || COMMA_END.has(prevLast)) continue;
+      const prevTokens = segs[i-1].trim().split(/\s+/);
+      if (prevTokens.length <= 1) continue; // 앞 세그먼트가 1어절이면 건드리지 않음
+      const pulled = prevTokens.pop();
+      segs[i-1] = prevTokens.join(' ');
+      segs[i] = pulled + ' ' + segs[i];
+    }
+  }
+  // 빈 세그먼트 제거
+  return segs.filter(s => s.trim());
 }
 
 async function convertTxt() {
