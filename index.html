@@ -791,33 +791,161 @@ function secToSrtTime(sec) {
 }
 
 // ══ 1. 싱크 합치기 ══
+// ══ 자막 파싱 유틸 ══
+function parseSRTEntries(text) {
+  const blocks = text.trim().split(/\n\s*\n/);
+  const entries = [];
+  for (const block of blocks) {
+    const lines = block.trim().split('\n');
+    const timeLine = lines.find(l => l.includes(' --> '));
+    if (!timeLine) continue;
+    const srtToSec = s => {
+      const m = s.trim().match(/(\d+):(\d+):(\d+)[,.](\d+)/);
+      if (!m) return 0;
+      return +m[1]*3600 + +m[2]*60 + +m[3] + +m[4]/1000;
+    };
+    const [startStr, endStr] = timeLine.split(' --> ');
+    const textLines = lines.slice(lines.indexOf(timeLine)+1).join('\n');
+    entries.push({ start: srtToSec(startStr), end: srtToSec(endStr), text: textLines });
+  }
+  return entries;
+}
+
+function parseVTTEntries(text) {
+  const blocks = text.trim().split(/\n\s*\n/);
+  const entries = [];
+  for (const block of blocks) {
+    const lines = block.trim().split('\n').filter(l => !l.startsWith('WEBVTT') && !l.startsWith('NOTE'));
+    const timeLine = lines.find(l => l.includes(' --> '));
+    if (!timeLine) continue;
+    const vttToSec = s => {
+      s = s.trim().split(' ')[0];
+      const m = s.match(/(?:(\d+):)?(\d+):(\d+)[,.](\d+)/);
+      if (!m) return 0;
+      return (+m[1]||0)*3600 + +m[2]*60 + +m[3] + +m[4]/1000;
+    };
+    const [startStr, endStr] = timeLine.split(' --> ');
+    const textLines = lines.slice(lines.indexOf(timeLine)+1).join('\n');
+    entries.push({ start: vttToSec(startStr), end: vttToSec(endStr), text: textLines });
+  }
+  return entries;
+}
+
+function parseASSEntries(text) {
+  const entries = [];
+  const secFromASS = s => {
+    const m = s.match(/(\d+):(\d+):(\d+)\.(\d+)/);
+    if (!m) return 0;
+    return +m[1]*3600 + +m[2]*60 + +m[3] + +m[4]/100;
+  };
+  for (const line of text.split('\n')) {
+    if (!line.startsWith('Dialogue:')) continue;
+    const parts = line.split(',');
+    if (parts.length < 10) continue;
+    entries.push({ start: secFromASS(parts[1]), end: secFromASS(parts[2]), text: parts.slice(9).join(',').replace(/\{[^}]*\}/g,'').trim() });
+  }
+  return entries;
+}
+
+function parseSBVEntries(text) {
+  const blocks = text.trim().split(/\n\s*\n/);
+  const entries = [];
+  for (const block of blocks) {
+    const lines = block.trim().split('\n');
+    const timeLine = lines.find(l => /\d:\d+:\d+\.\d+,\d:\d+:\d+\.\d+/.test(l));
+    if (!timeLine) continue;
+    const sbvToSec = s => {
+      const m = s.trim().match(/(\d+):(\d+):(\d+)\.(\d+)/);
+      if (!m) return 0;
+      return +m[1]*3600 + +m[2]*60 + +m[3] + +m[4]/1000;
+    };
+    const [startStr, endStr] = timeLine.split(',');
+    entries.push({ start: sbvToSec(startStr), end: sbvToSec(endStr), text: lines.slice(lines.indexOf(timeLine)+1).join('\n') });
+  }
+  return entries;
+}
+
+function parseSubtitleEntries(text, fmt) {
+  if (fmt === 'vtt') return parseVTTEntries(text);
+  if (fmt === 'ass' || fmt === 'ssa') return parseASSEntries(text);
+  if (fmt === 'sbv') return parseSBVEntries(text);
+  return parseSRTEntries(text);
+}
+
+function secToSRT(sec) {
+  const h = Math.floor(sec/3600), m = Math.floor((sec%3600)/60),
+        s = Math.floor(sec%60), ms = Math.round((sec%1)*1000);
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')},${String(ms).padStart(3,'0')}`;
+}
+
+function buildOutputSRT(entries, fmt) {
+  const secToVTT = sec => secToSRT(sec).replace(',','.');
+  const secToASS = sec => { const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=Math.floor(sec%60),cs=Math.round((sec%1)*100); return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${String(cs).padStart(2,'0')}`; };
+  if (fmt === 'vtt') return 'WEBVTT\n\n' + entries.map((e,i)=>`${i+1}\n${secToVTT(e.start)} --> ${secToVTT(e.end)}\n${e.text}`).join('\n\n');
+  if (fmt === 'ass') {
+    const hdr = `[Script Info]\nScriptType: v4.00+\n\n[V4+ Styles]\nFormat: Name, Fontname, Fontsize, PrimaryColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\nStyle: Default,Arial,20,&H00FFFFFF,0,0,0,0,100,100,0,0,1,2,0,2,10,10,10,1\n\n[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n`;
+    return hdr + entries.map(e=>`Dialogue: 0,${secToASS(e.start)},${secToASS(e.end)},Default,,0,0,0,,${e.text.replace(/\n/g,'\\N')}`).join('\n');
+  }
+  if (fmt === 'sbv') return entries.map(e=>`${secToVTT(e.start)},${secToVTT(e.end)}\n${e.text}`).join('\n\n');
+  if (fmt === 'txt') return entries.map(e=>e.text).join('\n');
+  return entries.map((e,i)=>`${i+1}\n${secToSRT(e.start)} --> ${secToSRT(e.end)}\n${e.text}`).join('\n\n');
+}
+
 async function retimeSRT() {
   const errEl = document.getElementById('retimeError');
   const resEl = document.getElementById('retimeResult');
+  const btn = document.querySelector('[onclick="retimeSRT()"]');
+  const btnSpan = btn ? btn.querySelector('span[data-i18n]') : null;
   errEl.style.display='none'; resEl.style.display='none';
+
   const w = document.getElementById('whisperSrtText').value.trim();
   const o = document.getElementById('originalSrtText').value.trim();
+  const wFmt = document.getElementById('whisperFmt')?.value || 'srt';
+  const oFmt = document.getElementById('originalFmt')?.value || 'srt';
+  const outFmt = document.getElementById('retimeOutFmt')?.value || 'srt';
+
   if (!w) { errEl.textContent='⚠ Whisper SRT를 입력해주세요'; errEl.style.display='block'; return; }
   if (!o) { errEl.textContent='⚠ 원문 SRT를 입력해주세요'; errEl.style.display='block'; return; }
+
+  // 버튼 처리중 상태
+  if (btn) { btn.disabled = true; btn.style.opacity = '0.7'; }
+  if (btnSpan) btnSpan.textContent = '⏳ 처리 중...';
+
   try {
-    const res = await fetch(RENDER_URL+'/api/merge', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        whisper_srt: w, original_srt: o,
-        whisper_fmt: document.getElementById('whisperFmt')?.value || 'srt',
-        original_fmt: document.getElementById('originalFmt')?.value || 'srt',
-        output_fmt: document.getElementById('retimeOutFmt')?.value || 'srt'
-      })
+    const wEntries = parseSubtitleEntries(w, wFmt);
+    const oEntries = parseSubtitleEntries(o, oFmt);
+
+    if (!wEntries.length) throw new Error('Whisper 자막을 파싱할 수 없습니다. 형식을 확인해주세요.');
+    if (!oEntries.length) throw new Error('원문 자막을 파싱할 수 없습니다. 형식을 확인해주세요.');
+
+    const totalDur = wEntries[wEntries.length-1].end;
+    const totalChars = oEntries.reduce((a,e) => a + (e.text.length || 1), 0);
+    let cursor = wEntries[0].start;
+
+    const result = oEntries.map((e, i) => {
+      const ratio = (e.text.length || 1) / totalChars;
+      const dur = ratio * totalDur;
+      const start = cursor;
+      const end = i === oEntries.length - 1 ? totalDur : Math.min(cursor + dur, totalDur);
+      cursor = end;
+      return { start, end, text: e.text };
     });
-    const data = await res.json();
-    if (data.error) throw new Error(data.error);
-    state.retime = data.srt;
-    document.getElementById('retimeW').textContent = data.whisper_count;
-    document.getElementById('retimeO').textContent = data.original_count;
-    document.getElementById('retimeC').textContent = data.count;
-    renderSRT(data.srt, 'retimeSrtPreview');
-    resEl.style.display='block';
-  } catch(e) { errEl.textContent='⚠ '+e.message; errEl.style.display='block'; }
+
+    const srt = buildOutputSRT(result, outFmt);
+    state.retime = srt;
+    document.getElementById('retimeW').textContent = wEntries.length;
+    document.getElementById('retimeO').textContent = oEntries.length;
+    document.getElementById('retimeC').textContent = result.length;
+    renderSRT(srt, 'retimeSrtPreview');
+    resEl.style.display = 'block';
+
+  } catch(e) {
+    errEl.textContent = '⚠ ' + e.message;
+    errEl.style.display = 'block';
+  } finally {
+    if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
+    if (btnSpan) btnSpan.textContent = t('retime.btn');
+  }
 }
 
 // ══ 2. 텍스트 → SRT ══
