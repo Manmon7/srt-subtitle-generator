@@ -283,7 +283,7 @@ footer{padding:36px 24px;border-top:1px solid var(--line);display:flex;justify-c
       <div class="grid2" style="margin-top:14px">
         <div>
           <label class="field-label" data-i18n="txt2srt.maxchars">최대 글자 수 (한글 기준)</label>
-          <input type="number" id="txt2srtMaxChars" value="10" min="5" max="30">
+          <input type="number" id="txt2srtMaxChars" value="11" min="5" max="30">
         </div>
         <div>
           <label class="field-label" data-i18n="txt2srt.duration">영상 총 길이 (초, 타임스탬프 계산용)</label>
@@ -901,15 +901,16 @@ function splitTextLocal(text, maxChars) {
     flush();
   }
 
-  // 3) 후처리: 너무 짧은 세그먼트는 앞 세그먼트의 마지막 어절을 끌어옴
-  //    단, 앞 세그먼트가 문장부호로 끝난 경우 경계 침범 안 함
+  // 3) 후처리: 짧은 세그먼트는 앞 세그먼트의 마지막 어절을 끌어옴
+  //    앞 세그먼트가 문장부호로 끝난 경우엔 끌어오지 않음 (문장 경계 유지)
+  //    현재 세그먼트가 문장부호로 끝나도 짧으면 끌어옴
   for (let i = 1; i < segs.length; i++) {
     if (koreanLen(segs[i]) < MIN_LEN) {
       const prevLast = segs[i-1].trim().slice(-1);
-      // 앞 세그먼트가 문장부호로 끝나면 끌어오지 않음
+      // 앞 세그먼트가 문장부호로 끝나면 끌어오지 않음 (앞 문장 완결)
       if (SENTENCE_END.has(prevLast) || COMMA_END.has(prevLast)) continue;
       const prevTokens = segs[i-1].trim().split(/\s+/);
-      if (prevTokens.length <= 1) continue; // 앞 세그먼트가 1어절이면 건드리지 않음
+      if (prevTokens.length <= 1) continue;
       const pulled = prevTokens.pop();
       segs[i-1] = prevTokens.join(' ');
       segs[i] = pulled + ' ' + segs[i];
@@ -926,7 +927,7 @@ async function convertTxt() {
   errEl.style.display = 'none';
   const text = document.getElementById('rawText').value.trim();
   if (!text) { errEl.textContent = '⚠ 텍스트를 입력해주세요'; errEl.style.display = 'block'; return; }
-  const maxChars = parseInt(document.getElementById('txt2srtMaxChars').value) || 10;
+  const maxChars = parseInt(document.getElementById('txt2srtMaxChars').value) || 11;
   if (btn) { btn.disabled = true; btn.style.opacity = '0.7'; }
   if (btnSpan) btnSpan.textContent = '⏳ 처리 중...';
   try {
